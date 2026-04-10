@@ -1,168 +1,531 @@
-/* Especificación de Diseño CSS - Sagash */
-* {
+/* ===== RESET & VARIABLES ===== */
+*, *::before, *::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif; /* Inter se ve más moderna */
 }
 
+:root {
+    --dorado: #C9A84C;
+    --dorado-claro: #e5c05b;
+    --dorado-oscuro: #8B6914;
+    --negro: #0a0702;
+    --negro-medio: #150d00;
+    --gris: #888888;
+    --gris-oscuro: #444444;
+    --blanco: #ffffff;
+}
 
-    body {
-    background-color: #0d0d0d; /* Un negro casi puro, muy elegante */
-    color: #ffffff; /* Texto blanco para máximo contraste */
+html, body {
+    height: 100%;
+    background-color: var(--negro);
+    color: var(--blanco);
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+/* ===== PANTALLAS ===== */
+.pantalla {
     min-height: 100vh;
-    display: flex;
+    display: none;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    overflow-x: hidden;
-    }
+    padding: 2rem 1.5rem;
+    position: relative;
+}
 
+.pantalla.activa {
+    display: flex;
+}
+
+/* ===== LOGO ===== */
 .logo-esquina {
     position: absolute;
-    top: 2.5rem;
-    left: 2.5rem;
-    max-width: 120px;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+    top: 1.5rem;
+    left: 1.5rem;
+    width: 75px;
+    height: 75px;
+    object-fit: contain;
+    border-radius: 10px;
 }
 
-.contenedor-central {
-    /* Mantenemos el flex column */
+/* ===== PANTALLA ESFERA ===== */
+.contenido-esfera {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Alineado a la izquierda como una carta */
-    justify-content: center;
-    max-width: 850px; /* Reducimos un poco el ancho para que el texto no se estire de más */
-    margin-left: 15%; /* Le damos aire respecto al logo */
-    gap: 1.5rem; /* Espacio entre los bloques */
+    align-items: center;
+    text-align: center;
+    gap: 2rem;
+    max-width: 600px;
+    width: 100%;
+    padding-top: 5rem;
 }
 
-.frase-persuasiva {
-    font-size: 3.2rem; /* Un poco más grande para que impacte */
+.texto-intro {
+    font-size: 0.8rem;
+    color: var(--gris-oscuro);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.titulo-esfera {
+    font-size: 1.8rem;
     font-weight: 900;
-    line-height: 1.05;
-    letter-spacing: -1.5px;
-    color: #e5c05b;
-    margin-bottom: 0.5rem;
-}
-.subtexto-bravo {
-    font-size: 1.1rem;
-    line-height: 1.4;
-    color: #888888;
-    max-width: 550px;
-    margin-bottom: 2rem;
-    border-left: 3px solid #25D366; /* Una línea verde sutil para guiar el ojo */
-    padding-left: 15px;
+    color: var(--dorado-claro);
+    line-height: 1.2;
+    letter-spacing: -0.5px;
 }
 
-/* El pequeño texto de abajo de la frase */
-.frase-persuasiva span {
-    display: block;
-    font-size: 1.1rem;
-    font-weight: 400;
-    letter-spacing: 0;
-    margin-top: 1rem;
-    color: #666;
+/* ===== ESFERA ===== */
+.esfera-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+    width: 100%;
 }
 
-.boton-accion {
-    /* Tu botón actual pero con un toque más de "llamado a la acción" */
-    padding: 1rem 2.5rem;
-    font-size: 1.1rem;
-    border-radius: 8px; /* Menos redondo se ve más serio/profesional */
-    background: #1a1a1a; /* Negro para contrastar con el verde de WhatsApp si quieres algo más premium */
-    color: #ffffff;
-    /* O mantén el verde si prefieres la asociación directa con WA */
+.esfera {
+    position: relative;
+    width: 190px;
+    height: 190px;
+    cursor: pointer;
+    flex-shrink: 0;
 }
 
-.boton-accion:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 15px 30px rgba(37, 211, 102, 0.3);
+.esfera-anillo {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(201, 168, 76, 0.35);
+    background: radial-gradient(circle at 35% 30%,
+        rgba(201, 168, 76, 0.25) 0%,
+        rgba(201, 168, 76, 0.08) 50%,
+        transparent 70%);
+    box-shadow:
+        0 0 35px rgba(201, 168, 76, 0.35),
+        0 0 70px rgba(201, 168, 76, 0.15),
+        inset 0 0 30px rgba(201, 168, 76, 0.08);
+    animation: pulsarEsfera 3s ease-in-out infinite;
+    transition: box-shadow 0.4s ease;
 }
 
-/* Efecto de sutil resplandor al botón */
-.boton-accion:active {
+.esfera-imagen {
+    position: absolute;
+    inset: 12px;
+    width: calc(100% - 24px);
+    height: calc(100% - 24px);
+    object-fit: contain;
+    border-radius: 50%;
+    transition: transform 0.4s ease;
+}
+
+.esfera.activa .esfera-imagen {
+    transform: scale(1.06);
+}
+
+.esfera.activa .esfera-anillo {
+    box-shadow:
+        0 0 55px rgba(201, 168, 76, 0.65),
+        0 0 110px rgba(201, 168, 76, 0.35),
+        inset 0 0 50px rgba(201, 168, 76, 0.15);
+    animation: pulsarActiva 1.2s ease-in-out infinite;
+}
+
+@keyframes pulsarEsfera {
+    0%, 100% {
+        box-shadow:
+            0 0 35px rgba(201, 168, 76, 0.35),
+            0 0 70px rgba(201, 168, 76, 0.15);
+    }
+    50% {
+        box-shadow:
+            0 0 50px rgba(201, 168, 76, 0.5),
+            0 0 90px rgba(201, 168, 76, 0.25);
+    }
+}
+
+@keyframes pulsarActiva {
+    0%, 100% {
+        box-shadow:
+            0 0 55px rgba(201, 168, 76, 0.65),
+            0 0 110px rgba(201, 168, 76, 0.35);
+    }
+    50% {
+        box-shadow:
+            0 0 75px rgba(201, 168, 76, 0.85),
+            0 0 150px rgba(201, 168, 76, 0.5);
+    }
+}
+
+/* ===== OPCIONES ESFERA ===== */
+.opciones-esfera {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 300px;
+    opacity: 0;
+    transform: translateY(15px);
+    pointer-events: none;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.opciones-esfera.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+.opcion-btn {
+    background: transparent;
+    border: 1px solid var(--dorado-oscuro);
+    color: var(--dorado-claro);
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+    font-family: inherit;
+}
+
+.opcion-btn:hover,
+.opcion-btn:active {
+    background: var(--dorado-oscuro);
+    color: var(--blanco);
+    border-color: var(--dorado);
     transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(201, 168, 76, 0.25);
 }
 
-/* Adaptabilidad para móviles */
-@media (max-width: 768px) {
-    .logo-esquina {
-        position: relative;
-        top: 0;
-        left: 0;
-        margin-bottom: 2rem;
-    }
-    
-    .contenedor-central {
-        align-items: center; /* En móvil centramos todo */
-        text-align: center;
-        padding-top: 5rem;
-    }
-    
-    .boton-accion {
-        align-self: center;
-        width: 100%;
-        text-align: center;
-    }
-    /* --- VISTA PARA CELULARES --- */
-@media (max-width: 768px) {
+.texto-toca {
+    font-size: 0.8rem;
+    color: var(--gris-oscuro);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: parpadear 2.5s ease-in-out infinite;
+    transition: opacity 0.4s ease;
+}
 
-    body {
-    background-color: #0d0d0d; /* Un negro casi puro, muy elegante */
-    color: #ffffff; /* Texto blanco para máximo contraste */
-    min-height: 100vh;
+.texto-toca.oculto {
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes parpadear {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+}
+
+/* ===== PANTALLA ALEATORIO ===== */
+#pantalla-aleatorio {
+    gap: 0;
+}
+
+.slot-contenedor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+.slot-titulo {
+    font-size: 1rem;
+    color: var(--gris);
+    letter-spacing: 1px;
+}
+
+.slot-card {
+    width: 170px;
+    height: 170px;
+    background: var(--negro-medio);
+    border: 2px solid var(--dorado-oscuro);
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow-x: hidden;
-    }
+    box-shadow: 0 0 40px rgba(201, 168, 76, 0.15);
+}
 
-    .logo-esquina {
-        /* El logo deja de estar flotando y se centra arriba */
-        position: relative;
-        top: 0;
-        left: 0;
-        margin: 0 auto 3rem auto;
-        display: block;
-        max-width: 100px;
-    }
+.slot-signo {
+    font-size: 5rem;
+    color: var(--dorado);
+    font-weight: 900;
+}
 
-    .contenedor-central {
-        /* Centramos todo el texto para que sea más fácil de leer en pantallas estrechas */
-        margin-left: 0;
-        width: 100%;
-        align-items: center;
-        text-align: center;
-        padding: 0;
-        gap: 2rem;
-    }
+.slot-card.girando {
+    animation: girar 0.18s linear infinite;
+}
 
-    .frase-persuasiva {
-        /* Reducimos el tamaño para que no ocupe toda la pantalla de un solo golpe */
-        font-size: 2.2rem;
-        line-height: 1.1;
-        letter-spacing: -1px;
-    }
+@keyframes girar {
+    0%   { transform: scaleX(1); }
+    50%  { transform: scaleX(0); }
+    100% { transform: scaleX(1); }
+}
 
-    .subtexto-bravo {
-        /* Quitamos la línea lateral en móvil para ganar espacio y centramos */
-        border-left: none;
-        padding-left: 0;
-        font-size: 1rem;
-        margin-bottom: 2rem;
-        color: #555;
-    }
+/* ===== REVELACIÓN ===== */
+.revelacion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1.5rem;
+    max-width: 480px;
+    width: 100%;
+    padding-top: 5rem;
+}
 
-    .boton-accion {
-        /* El botón se vuelve más ancho para que sea fácil de tocar con el pulgar */
-        width: 100%;
-        max-width: 320px;
-        padding: 1.2rem;
-        font-size: 1.2rem;
-        text-align: center;
-        align-self: center;
-        /* Un poco de sombra extra para que resalte sobre el fondo */
-        box-shadow: 0 10px 25px rgba(37, 211, 102, 0.3);
+.storytelling-texto {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--dorado-claro);
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+}
+
+.producto-imagen-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.producto-imagen-contenedor {
+    width: 200px;
+    height: 200px;
+    border-radius: 16px;
+    background: var(--negro-medio);
+    border: 2px dashed var(--dorado-oscuro);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: var(--gris-oscuro);
+    font-size: 0.8rem;
+}
+
+.producto-imagen-contenedor img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+}
+
+.producto-nombre {
+    font-size: 0.85rem;
+    color: var(--gris);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* ===== PANTALLA ESPECÍFICO ===== */
+.especifico-contenedor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 2rem;
+    max-width: 600px;
+    width: 100%;
+    padding-top: 5rem;
+}
+
+.especifico-titulo {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--dorado-claro);
+    letter-spacing: -1px;
+}
+
+.especifico-sub {
+    font-size: 1rem;
+    color: var(--gris);
+    margin-top: -1.5rem;
+}
+
+.categorias-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 300px;
+}
+
+.categoria-card {
+    padding: 1.3rem 1rem;
+    border: 1px solid var(--dorado-oscuro);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--dorado-claro);
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+
+.categoria-card:hover,
+.categoria-card:active,
+.categoria-card.seleccionada {
+    background: var(--dorado-oscuro);
+    border-color: var(--dorado);
+    color: var(--blanco);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(201, 168, 76, 0.25);
+}
+
+/* ===== GRID DE PRODUCTOS ===== */
+.productos-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 500px;
+}
+
+.producto-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--negro-medio);
+    border: 1px solid var(--gris-oscuro);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    padding: 0;
+}
+
+.producto-card:hover,
+.producto-card:active {
+    border-color: var(--dorado-oscuro);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(201, 168, 76, 0.15);
+}
+
+.producto-card-imagen {
+    width: 90px;
+    height: 90px;
+    flex-shrink: 0;
+    background: var(--gris-oscuro);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--negro);
+    font-size: 0.7rem;
+    overflow: hidden;
+}
+
+.producto-card-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.producto-card-info {
+    padding: 1rem 1rem 1rem 0;
+    flex: 1;
+}
+
+.producto-card-nombre {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--dorado-claro);
+    margin-bottom: 0.3rem;
+}
+
+.producto-card-mini-copy {
+    font-size: 0.8rem;
+    color: var(--gris);
+    line-height: 1.4;
+}
+
+/* ===== BOTONES ===== */
+.boton-accion {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: var(--dorado);
+    color: var(--negro);
+    font-size: 1rem;
+    font-weight: 900;
+    border-radius: 8px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+    font-family: inherit;
+}
+
+.boton-accion:hover,
+.boton-accion:active {
+    background: var(--dorado-claro);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(201, 168, 76, 0.35);
+}
+
+.boton-volver {
+    background: transparent;
+    border: none;
+    color: var(--gris-oscuro);
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.3s ease;
+    letter-spacing: 0.5px;
+    font-family: inherit;
+}
+
+.boton-volver:hover {
+    color: var(--gris);
+}
+
+/* ===== UTILIDADES ===== */
+.oculta {
+    display: none !important;
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
+
+/* ===== RESPONSIVE DESKTOP ===== */
+@media (min-width: 600px) {
+    .titulo-esfera {
+        font-size: 2.4rem;
+    }
+
+    .esfera {
+        width: 220px;
+        height: 220px;
+    }
+
+    .categorias-grid {
+        flex-direction: row;
+        max-width: 100%;
+        justify-content: center;
+    }
+
+    .categoria-card {
+        flex: 1;
+        max-width: 160px;
+    }
+
+    .storytelling-texto {
+        font-size: 2rem;
+    }
 }

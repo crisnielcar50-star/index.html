@@ -3,23 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corrector de Postura - Solución Definitiva</title>
+    <title>HeyySagash — Tu Bienestar, Nuestra Pasión</title>
     <link rel="stylesheet" href="css.css">
 </head>
 <body>
-    <img src="fotooficial.png" alt="Logotipo Institucional" class="logo-esquina">
-    <div class="contenedor-central">
-        <div class="contenido-venta">
-       <h1 class="frase-persuasiva">
-   Tu espalda no está diseñada para vivir encorvada frente a una pantalla, aunque tu cuerpo ya se haya acostumbrado al dolor.
-    <span>Recupera tu postura natural antes de que el daño sea permanente. Habla con nosotros y te explicamos cómo lograrlo en 21 días.
-    <main class="contenedor-central">
-        <h1 class="frase-persuasiva">
-            </h1>
-        <a href="#" id="btn-whatsapp" class="boton-accion">
-            Quiero corregir mi postura ahora
-        </a>
-    </main>
+
+    <!-- ====== PANTALLA 1: ESFERA ====== -->
+    <section id="pantalla-esfera" class="pantalla activa">
+        <img src="fotooficial.png" alt="HeyySagash" class="logo-esquina">
+
+        <div class="contenido-esfera">
+            <p class="texto-intro">Tu bienestar, nuestra pasión</p>
+            <h1 class="titulo-esfera">Entraste buscando algo.<br>Probablemente te lleves<br>lo que realmente te hace falta.</h1>
+
+            <div class="esfera-wrapper">
+                <div class="esfera" id="esfera">
+                    <div class="esfera-anillo"></div>
+                    <img src="fotooficial.png" alt="Sagash" class="esfera-imagen">
+                </div>
+
+                <div class="opciones-esfera" id="opciones-esfera">
+                    <button class="opcion-btn" id="btn-aleatorio">
+                        Algo que necesito y no sabía
+                    </button>
+                    <button class="opcion-btn" id="btn-especifico">
+                        Busco algo específico
+                    </button>
+                </div>
+            </div>
+
+            <p class="texto-toca" id="texto-toca">Toca la esfera</p>
+        </div>
+    </section>
+
+    <!-- ====== PANTALLA 2: ALEATORIO ====== -->
+    <section id="pantalla-aleatorio" class="pantalla">
+        <img src="fotooficial.png" alt="HeyySagash" class="logo-esquina">
+
+        <div class="slot-contenedor" id="slot-contenedor">
+            <p class="slot-titulo">El universo está decidiendo...</p>
+            <div class="slot-card" id="slot-card">
+                <span class="slot-signo">?</span>
+            </div>
+        </div>
+
+        <div class="revelacion oculta" id="revelacion">
+            <h2 class="storytelling-texto" id="storytelling-texto"></h2>
+            <div class="producto-imagen-wrapper">
+                <div class="producto-imagen-contenedor" id="producto-imagen"></div>
+                <p class="producto-nombre" id="producto-nombre"></p>
+            </div>
+            <a href="#" class="boton-accion" id="btn-quiero">Lo quiero ahora →</a>
+            <button class="boton-volver" id="btn-volver-aleatorio">← Volver a la esfera</button>
+        </div>
+    </section>
+
+    <!-- ====== PANTALLA 3: ESPECÍFICO ====== -->
+    <section id="pantalla-especifico" class="pantalla">
+        <img src="fotooficial.png" alt="HeyySagash" class="logo-esquina">
+
+        <div class="especifico-contenedor">
+            <h2 class="especifico-titulo">¿Para quién es?</h2>
+            <p class="especifico-sub">Sin rodeos.</p>
+
+            <div class="categorias-grid" id="categorias-grid">
+                <div class="categoria-card" data-cat="ti">Para ti</div>
+                <div class="categoria-card" data-cat="hogar">Tu hogar</div>
+                <div class="categoria-card" data-cat="regalo">Un regalo</div>
+            </div>
+
+            <div class="productos-grid oculta" id="productos-grid"></div>
+
+            <button class="boton-volver" id="btn-volver-especifico">← Volver a la esfera</button>
+        </div>
+    </section>
 
     <script src="java.js"></script>
 </body>
