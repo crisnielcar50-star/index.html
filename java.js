@@ -1,52 +1,147 @@
-// ===== DATOS DE PRODUCTOS =====
-// Reemplaza imagen: con la ruta a la foto del producto cuando la tengas
+// ===== CONFIGURACIÓN =====
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpw9fuVt5Gre22LtUjrs6fcmi-CDSIyxK-HJBWkq24pPiq2kDjRKbaHzKU-BRnLGxt/exec';
+const NUMERO_SOPORTE = '573242919434';
+
+// ===== PRODUCTOS =====
 const productos = [
     {
         id: 'corrector',
         nombre: 'Corrector de Postura',
         storytelling: 'Tu jefe no va a notar que eres más productivo. Pero tú vas a notar que ya no llegas a casa con ganas de arrancarte la columna.',
         miniCopy: 'Para los que ya se acostumbraron al dolor sin darse cuenta.',
-        mensaje: 'Hola, vi el corrector de postura en HeyySagash y me interesa. ¿Cómo lo consigo?',
         categorias: ['ti', 'regalo'],
-        imagen: 'img/corrector.png'
+        imagen: 'img/corrector.png',
+        linkDropi: 'https://app.dropi.co/dashboard/product-details/729188/corrector-postura-espalda-ralla-colores'
     },
     {
         id: 'masajeador',
         nombre: 'Masajeador de Pies',
         storytelling: 'Llevas todo el día de pie y tu cuerpo lo sabe. Tus pies no están pidiendo descanso. Están exigiendo justicia.',
         miniCopy: 'El final del día que te mereces.',
-        mensaje: 'Hola, vi el masajeador de pies en HeyySagash y me interesa. ¿Cómo lo consigo?',
         categorias: ['ti', 'hogar', 'regalo'],
-        imagen: 'img/masajeador.png'
+        imagen: 'img/masajeador.png',
+        linkDropi: 'https://app.dropi.co/dashboard/product-details/1722321/masajeador-pasiva-para-pies'
     },
     {
         id: 'hombrera',
         nombre: 'Hombrera Térmica',
         storytelling: 'El frío no avisa. El dolor en el hombro tampoco. Pero tú puedes elegir no esperar a que llegue.',
         miniCopy: 'Protección antes de que el daño decida por ti.',
-        mensaje: 'Hola, vi la hombrera térmica en HeyySagash y me interesa. ¿Cómo lo consigo?',
         categorias: ['ti', 'regalo'],
-        imagen: 'img/hombrera.png'
+        imagen: 'img/hombrera.png',
+        linkDropi: 'https://app.dropi.co/dashboard/product-details/1941964/hombrera-termica-v8'
     },
     {
         id: 'consola',
         nombre: 'Consola USB',
         storytelling: 'No necesitas una excusa para volver a jugar. Ya eres adulto. Y ya trabajaste suficiente hoy.',
         miniCopy: 'Entretenimiento sin disculpas.',
-        mensaje: 'Hola, vi la consola USB en HeyySagash y me interesa. ¿Cómo lo consigo?',
         categorias: ['hogar', 'regalo'],
-        imagen: 'img/consola.png'
+        imagen: 'img/consola.png',
+        linkDropi: 'https://app.dropi.co/dashboard/product-details/650864/consola-retro-usb-20000-juegos-m8'
     }
 ];
 
-const NUMERO_WHATSAPP = '573242919434';
+let productoActual = null;
+let flujoActual = null;
 
-// ===== UTILIDADES =====
-function irAWhatsApp(mensaje) {
-    const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
-    window.open(url, '_blank');
+// ===== ANALYTICS =====
+function registrarEvento(flujo, producto, evento) {
+    try {
+        fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tipo: 'analytics', flujo, producto, evento })
+        });
+    } catch (e) {}
 }
 
+// ===== PARTÍCULAS =====
+function iniciarParticulas() {
+    const canvas = document.getElementById('canvas-particulas');
+    const ctx = canvas.getContext('2d');
+
+    function redimensionar() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    redimensionar();
+    window.addEventListener('resize', redimensionar);
+
+    const particulas = Array.from({ length: 55 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radio: Math.random() * 1.5 + 0.4,
+        opacidad: Math.random() * 0.35 + 0.08,
+        vx: (Math.random() - 0.5) * 0.25,
+        vy: (Math.random() - 0.5) * 0.25
+    }));
+
+    function animar() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particulas.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radio, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(201, 168, 76, ${p.opacidad})`;
+            ctx.fill();
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0) p.x = canvas.width;
+            if (p.x > canvas.width) p.x = 0;
+            if (p.y < 0) p.y = canvas.height;
+            if (p.y > canvas.height) p.y = 0;
+        });
+        requestAnimationFrame(animar);
+    }
+    animar();
+}
+
+// ===== SONIDO =====
+function reproducirSonido() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1046, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(523, ctx.currentTime + 0.4);
+
+        gain.gain.setValueAtTime(0.25, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.6);
+    } catch (e) {
+        // Navegador sin soporte de audio — continúa sin sonido
+    }
+}
+
+function reproducirTick() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(300, ctx.currentTime);
+
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.06);
+    } catch (e) {}
+}
+
+// ===== NAVEGACIÓN =====
 function mostrarPantalla(id) {
     document.querySelectorAll('.pantalla').forEach(p => {
         p.classList.remove('activa');
@@ -58,10 +153,155 @@ function mostrarPantalla(id) {
     window.scrollTo(0, 0);
 }
 
+// ===== FORMULARIO =====
+function mostrarFormulario(producto, flujo) {
+    productoActual = producto;
+    flujoActual = flujo;
+    registrarEvento(flujo, producto.nombre, 'formulario_abierto');
+    document.getElementById('form-producto-nombre').textContent = producto.nombre;
+    document.getElementById('formulario-pedido').reset();
+    const btn = document.getElementById('btn-confirmar');
+    btn.textContent = 'Confirmar Pedido';
+    btn.disabled = false;
+    document.getElementById('modal-formulario').classList.remove('oculta');
+}
+
+function cerrarFormulario() {
+    document.getElementById('modal-formulario').classList.add('oculta');
+}
+
+async function enviarPedido(e) {
+    e.preventDefault();
+
+    const btn = document.getElementById('btn-confirmar');
+    btn.textContent = 'Procesando...';
+    btn.disabled = true;
+
+    const datos = {
+        nombre: document.getElementById('input-nombre').value.trim(),
+        celular: document.getElementById('input-celular').value.trim(),
+        ciudad: document.getElementById('input-ciudad').value.trim(),
+        direccion: document.getElementById('input-direccion').value.trim(),
+        producto: productoActual.nombre
+    };
+
+    try {
+        await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos)
+        });
+    } catch (e) {
+        // no-cors siempre lanza error de lectura pero los datos llegan igual
+    }
+
+    registrarEvento(flujoActual, productoActual.nombre, 'pedido_confirmado');
+    cerrarFormulario();
+    mostrarPantalla('pantalla-exito');
+    reproducirSonido();
+    enviarConfirmacionWhatsApp(datos);
+}
+
+function enviarConfirmacionWhatsApp(datos) {
+    const celular = datos.celular.replace(/\D/g, '');
+    const numero = celular.startsWith('57') ? celular : `57${celular}`;
+    const mensaje =
+        `Hola ${datos.nombre}, tu pedido en HeyySagash fue confirmado.\n\n` +
+        `Producto: ${productoActual.nombre}\n` +
+        `Ciudad: ${datos.ciudad}\n` +
+        `Dirección: ${datos.direccion}\n\n` +
+        `Pronto recibirás información de tu envío. Gracias por confiar en HeyySagash.`;
+
+    setTimeout(() => {
+        window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`, '_blank');
+    }, 1200);
+}
+
+// ===== ALEATORIO =====
+function iniciarAleatorio() {
+    mostrarPantalla('pantalla-aleatorio');
+
+    const slotContenedor = document.getElementById('slot-contenedor');
+    const revelacion = document.getElementById('revelacion');
+    const slotCard = document.getElementById('slot-card');
+
+    slotContenedor.classList.remove('oculta');
+    revelacion.classList.add('oculta');
+    slotCard.innerHTML = '<span class="slot-signo">?</span>';
+    slotCard.classList.remove('girando');
+
+    const producto = productos[Math.floor(Math.random() * productos.length)];
+
+    slotCard.classList.add('girando');
+
+    // Ticks durante el giro
+    const intervaloTick = setInterval(reproducirTick, 180);
+
+    setTimeout(() => {
+        clearInterval(intervaloTick);
+        slotCard.classList.remove('girando');
+        slotCard.innerHTML = `<span style="font-size:1rem;font-weight:900;color:var(--dorado-claro);padding:1rem;text-align:center;line-height:1.3">${producto.nombre}</span>`;
+
+        setTimeout(() => {
+            reproducirSonido();
+            slotContenedor.classList.add('oculta');
+
+            document.getElementById('storytelling-texto').textContent = producto.storytelling;
+            document.getElementById('producto-nombre').textContent = producto.nombre;
+
+            const imgContainer = document.getElementById('producto-imagen');
+            imgContainer.innerHTML = producto.imagen
+                ? `<img src="${producto.imagen}" alt="${producto.nombre}">`
+                : `<span>Foto próximamente</span>`;
+
+            registrarEvento('aleatorio', producto.nombre, 'revelado');
+            document.getElementById('btn-quiero').onclick = () => mostrarFormulario(producto, 'aleatorio');
+
+            revelacion.classList.remove('oculta');
+            revelacion.classList.add('fade-in');
+        }, 700);
+    }, 2500);
+}
+
+// ===== ESPECÍFICO =====
+function resetEspecifico() {
+    const grid = document.getElementById('productos-grid');
+    grid.classList.add('oculta');
+    grid.innerHTML = '';
+    document.querySelectorAll('.categoria-card').forEach(c => c.classList.remove('seleccionada'));
+}
+
+function mostrarProductosDeCategoria(categoria, aleatorizar = false) {
+    const grid = document.getElementById('productos-grid');
+    let filtrados = productos.filter(p => p.categorias.includes(categoria));
+    if (aleatorizar) filtrados = filtrados.sort(() => Math.random() - 0.5);
+
+    grid.innerHTML = '';
+    filtrados.forEach(producto => {
+        const card = document.createElement('div');
+        card.className = 'producto-card fade-in';
+        card.innerHTML = `
+            <div class="producto-card-imagen">
+                ${producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}">` : ''}
+            </div>
+            <div class="producto-card-info">
+                <p class="producto-card-nombre">${producto.nombre}</p>
+                <p class="producto-card-mini-copy">${producto.miniCopy}</p>
+            </div>
+        `;
+        card.addEventListener('click', () => mostrarFormulario(producto, 'especifico'));
+        grid.appendChild(card);
+    });
+
+    grid.classList.remove('oculta');
+}
+
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
+    iniciarParticulas();
 
-    // ----- ESFERA -----
+    // Esfera
     const esfera = document.getElementById('esfera');
     const opcionesEsfera = document.getElementById('opciones-esfera');
     const textoToca = document.getElementById('texto-toca');
@@ -76,122 +316,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     esfera.addEventListener('click', activarEsfera);
-    // En desktop, activar también al pasar el cursor
     esfera.addEventListener('mouseenter', activarEsfera);
 
-    // ----- BOTÓN ALEATORIO -----
     document.getElementById('btn-aleatorio').addEventListener('click', iniciarAleatorio);
 
-    // ----- BOTÓN ESPECÍFICO -----
     document.getElementById('btn-especifico').addEventListener('click', () => {
         mostrarPantalla('pantalla-especifico');
         resetEspecifico();
     });
 
-    // ----- VOLVER -----
-    document.getElementById('btn-volver-aleatorio').addEventListener('click', () => {
-        mostrarPantalla('pantalla-esfera');
-    });
+    document.getElementById('btn-volver-aleatorio').addEventListener('click', () => mostrarPantalla('pantalla-esfera'));
+    document.getElementById('btn-volver-especifico').addEventListener('click', () => mostrarPantalla('pantalla-esfera'));
+    document.getElementById('btn-volver-exito').addEventListener('click', () => mostrarPantalla('pantalla-esfera'));
 
-    document.getElementById('btn-volver-especifico').addEventListener('click', () => {
-        mostrarPantalla('pantalla-esfera');
-    });
-
-    // ----- CATEGORÍAS -----
+    // Categorías
+    let categoriaActual = null;
     document.querySelectorAll('.categoria-card').forEach(card => {
         card.addEventListener('click', () => {
             document.querySelectorAll('.categoria-card').forEach(c => c.classList.remove('seleccionada'));
             card.classList.add('seleccionada');
-            mostrarProductosDeCategoria(card.dataset.cat);
+            categoriaActual = card.dataset.cat;
+            mostrarProductosDeCategoria(categoriaActual);
+            document.getElementById('btn-recargar').classList.remove('oculta');
         });
     });
-});
 
-// ===== LÓGICA ALEATORIO =====
-function iniciarAleatorio() {
-    mostrarPantalla('pantalla-aleatorio');
-
-    const slotContenedor = document.getElementById('slot-contenedor');
-    const revelacion = document.getElementById('revelacion');
-    const slotCard = document.getElementById('slot-card');
-
-    // Reset
-    slotContenedor.classList.remove('oculta');
-    revelacion.classList.add('oculta');
-    slotCard.innerHTML = '<span class="slot-signo">?</span>';
-    slotCard.classList.remove('girando');
-
-    // Elegir producto al azar
-    const producto = productos[Math.floor(Math.random() * productos.length)];
-
-    // Animación de slot
-    slotCard.classList.add('girando');
-
-    setTimeout(() => {
-        slotCard.classList.remove('girando');
-
-        // Mostrar nombre en la carta
-        slotCard.innerHTML = `<span style="font-size:1rem;font-weight:900;color:var(--dorado-claro);padding:1rem;text-align:center;line-height:1.3">${producto.nombre}</span>`;
-
-        setTimeout(() => {
-            slotContenedor.classList.add('oculta');
-
-            // Rellenar revelación
-            document.getElementById('storytelling-texto').textContent = producto.storytelling;
-            document.getElementById('producto-nombre').textContent = producto.nombre;
-
-            const imgContainer = document.getElementById('producto-imagen');
-            if (producto.imagen) {
-                imgContainer.innerHTML = `<img src="${producto.imagen}" alt="${producto.nombre}">`;
-            } else {
-                imgContainer.innerHTML = `<span>Foto próximamente</span>`;
-            }
-
-            const btnQuiero = document.getElementById('btn-quiero');
-            btnQuiero.onclick = (e) => {
-                e.preventDefault();
-                irAWhatsApp(producto.mensaje);
-            };
-
-            revelacion.classList.remove('oculta');
-            revelacion.classList.add('fade-in');
-        }, 700);
-
-    }, 2500);
-}
-
-// ===== LÓGICA ESPECÍFICO =====
-function resetEspecifico() {
-    const productosGrid = document.getElementById('productos-grid');
-    productosGrid.classList.add('oculta');
-    productosGrid.innerHTML = '';
-    document.querySelectorAll('.categoria-card').forEach(c => c.classList.remove('seleccionada'));
-}
-
-function mostrarProductosDeCategoria(categoria) {
-    const productosGrid = document.getElementById('productos-grid');
-    const filtrados = productos.filter(p => p.categorias.includes(categoria));
-
-    productosGrid.innerHTML = '';
-
-    filtrados.forEach(producto => {
-        const card = document.createElement('div');
-        card.className = 'producto-card fade-in';
-        card.innerHTML = `
-            <div class="producto-card-imagen">
-                ${producto.imagen
-                    ? `<img src="${producto.imagen}" alt="${producto.nombre}">`
-                    : ''
-                }
-            </div>
-            <div class="producto-card-info">
-                <p class="producto-card-nombre">${producto.nombre}</p>
-                <p class="producto-card-mini-copy">${producto.miniCopy}</p>
-            </div>
-        `;
-        card.addEventListener('click', () => irAWhatsApp(producto.mensaje));
-        productosGrid.appendChild(card);
+    // Botón recargar
+    document.getElementById('btn-recargar').addEventListener('click', () => {
+        if (categoriaActual) mostrarProductosDeCategoria(categoriaActual, true);
     });
 
-    productosGrid.classList.remove('oculta');
-}
+    // Formulario
+    document.getElementById('formulario-pedido').addEventListener('submit', enviarPedido);
+    document.getElementById('btn-cerrar-modal').addEventListener('click', cerrarFormulario);
+
+    // Cerrar modal al tocar fuera
+    document.getElementById('modal-formulario').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('modal-formulario')) cerrarFormulario();
+    });
+});

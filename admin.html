@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sagash Admin</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --dorado: #C9A84C;
+            --dorado-claro: #e5c05b;
+            --dorado-oscuro: #8B6914;
+            --negro: #0a0702;
+            --negro-medio: #150d00;
+            --gris: #888;
+            --gris-oscuro: #333;
+            --verde: #4CAF50;
+            --rojo: #e05252;
+        }
+
+        body {
+            background: var(--negro);
+            color: #fff;
+            font-family: 'Inter', Arial, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* ===== LOGIN ===== */
+        #pantalla-login {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+
+        #pantalla-login img { width: 90px; border-radius: 10px; }
+
+        #pantalla-login h1 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--dorado-claro);
+        }
+
+        #pantalla-login input {
+            width: 100%;
+            max-width: 300px;
+            background: var(--negro-medio);
+            border: 1px solid var(--gris-oscuro);
+            border-radius: 8px;
+            padding: 0.9rem 1rem;
+            color: #fff;
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            text-align: center;
+            letter-spacing: 3px;
+        }
+
+        #pantalla-login input:focus { border-color: var(--dorado-oscuro); }
+
+        .btn-dorado {
+            background: var(--dorado);
+            color: var(--negro);
+            border: none;
+            padding: 0.9rem 2.5rem;
+            font-size: 1rem;
+            font-weight: 900;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .btn-dorado:hover { background: var(--dorado-claro); }
+
+        #error-login {
+            color: var(--rojo);
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        /* ===== DASHBOARD ===== */
+        #dashboard { display: none; }
+
+        .admin-header {
+            background: var(--negro-medio);
+            border-bottom: 1px solid var(--gris-oscuro);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .admin-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-header img { width: 45px; border-radius: 6px; }
+
+        .admin-header h1 {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--dorado-claro);
+        }
+
+        .btn-salir {
+            background: transparent;
+            border: 1px solid var(--gris-oscuro);
+            color: var(--gris);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .btn-salir:hover { border-color: var(--dorado-oscuro); color: var(--dorado-claro); }
+
+        .admin-body {
+            padding: 2rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        /* ===== STATS GENERALES ===== */
+        .stats-fila {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: var(--negro-medio);
+            border: 1px solid var(--gris-oscuro);
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+        }
+
+        .stat-numero {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--dorado-claro);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--gris);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 0.3rem;
+        }
+
+        /* ===== SECCIÓN ===== */
+        .seccion-titulo {
+            font-size: 1rem;
+            font-weight: 900;
+            color: var(--dorado-claro);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--gris-oscuro);
+        }
+
+        /* ===== ANALYTICS PRODUCTOS ===== */
+        .productos-analytics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .producto-stat {
+            background: var(--negro-medio);
+            border: 1px solid var(--gris-oscuro);
+            border-radius: 12px;
+            padding: 1.2rem;
+        }
+
+        .producto-stat-nombre {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--dorado-claro);
+            margin-bottom: 1rem;
+        }
+
+        .funnel-fila {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid var(--gris-oscuro);
+            font-size: 0.8rem;
+        }
+
+        .funnel-fila:last-child { border-bottom: none; }
+
+        .funnel-label { color: var(--gris); }
+
+        .funnel-valor { font-weight: 700; color: #fff; }
+
+        .funnel-conversion {
+            font-size: 0.75rem;
+            color: var(--verde);
+            font-weight: 700;
+        }
+
+        /* ===== TABLA PEDIDOS ===== */
+        .tabla-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--gris-oscuro);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        thead tr {
+            background: var(--negro-medio);
+        }
+
+        th {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            color: var(--dorado-oscuro);
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 0.8rem 1rem;
+            border-top: 1px solid var(--gris-oscuro);
+            color: #ccc;
+            white-space: nowrap;
+        }
+
+        tr:hover td { background: rgba(201, 168, 76, 0.04); }
+
+        .sin-datos {
+            text-align: center;
+            color: var(--gris);
+            padding: 2rem;
+            font-size: 0.85rem;
+        }
+
+        /* ===== LOADING ===== */
+        #cargando {
+            text-align: center;
+            color: var(--gris);
+            padding: 3rem;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .oculto { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN -->
+    <div id="pantalla-login">
+        <img src="fotooficial.png" alt="Sagash">
+        <h1>Panel Sagash</h1>
+        <input type="password" id="input-clave" placeholder="Clave de acceso" autocomplete="current-password">
+        <button class="btn-dorado" onclick="iniciarSesion()">Entrar</button>
+        <p id="error-login">Clave incorrecta</p>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard">
+        <div class="admin-header">
+            <div class="admin-header-left">
+                <img src="fotooficial.png" alt="Sagash">
+                <h1>Panel Administrativo</h1>
+            </div>
+            <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+        </div>
+
+        <div class="admin-body">
+            <div id="cargando">Cargando datos...</div>
+
+            <div id="contenido-admin" class="oculto">
+
+                <!-- Stats generales -->
+                <div class="stats-fila">
+                    <div class="stat-card">
+                        <div class="stat-numero" id="stat-total">0</div>
+                        <div class="stat-label">Pedidos totales</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-numero" id="stat-hoy">0</div>
+                        <div class="stat-label">Pedidos hoy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-numero" id="stat-revelados">0</div>
+                        <div class="stat-label">Productos revelados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-numero" id="stat-conversion">0%</div>
+                        <div class="stat-label">Conversión global</div>
+                    </div>
+                </div>
+
+                <!-- Analytics por producto -->
+                <div>
+                    <p class="seccion-titulo">Rendimiento por producto</p>
+                    <div class="productos-analytics" id="productos-analytics"></div>
+                </div>
+
+                <!-- Tabla pedidos -->
+                <div>
+                    <p class="seccion-titulo">Pedidos recientes</p>
+                    <div class="tabla-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Nombre</th>
+                                    <th>Celular</th>
+                                    <th>Ciudad</th>
+                                    <th>Dirección</th>
+                                    <th>Producto</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-pedidos"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpw9fuVt5Gre22LtUjrs6fcmi-CDSIyxK-HJBWkq24pPiq2kDjRKbaHzKU-BRnLGxt/exec';
+
+        const linksDropi = {
+            'Corrector de Postura': 'https://app.dropi.co/dashboard/product-details/729188/corrector-postura-espalda-ralla-colores',
+            'Masajeador de Pies': 'https://app.dropi.co/dashboard/product-details/1722321/masajeador-pasiva-para-pies',
+            'Hombrera Térmica': 'https://app.dropi.co/dashboard/product-details/1941964/hombrera-termica-v8',
+            'Consola USB': 'https://app.dropi.co/dashboard/product-details/650864/consola-retro-usb-20000-juegos-m8'
+        };
+        const CLAVE_CORRECTA = 'sagash2025';
+        let claveActual = '';
+
+        // Enter para login
+        document.getElementById('input-clave').addEventListener('keydown', e => {
+            if (e.key === 'Enter') iniciarSesion();
+        });
+
+        function iniciarSesion() {
+            const clave = document.getElementById('input-clave').value.trim();
+            if (clave !== CLAVE_CORRECTA) {
+                document.getElementById('error-login').style.display = 'block';
+                return;
+            }
+            claveActual = clave;
+            document.getElementById('pantalla-login').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            cargarDatos();
+        }
+
+        function cerrarSesion() {
+            document.getElementById('pantalla-login').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('input-clave').value = '';
+            claveActual = '';
+        }
+
+        function cargarDatos() {
+            document.getElementById('cargando').classList.remove('oculto');
+            document.getElementById('contenido-admin').classList.add('oculto');
+            document.getElementById('cargando').textContent = 'Cargando datos...';
+
+            const callbackName = 'sagashCb_' + Date.now();
+
+            const timeout = setTimeout(() => {
+                delete window[callbackName];
+                document.getElementById('cargando').textContent = 'Error al cargar datos. Intenta de nuevo.';
+            }, 10000);
+
+            window[callbackName] = function(datos) {
+                clearTimeout(timeout);
+                delete window[callbackName];
+                if (datos.error) {
+                    document.getElementById('cargando').textContent = 'Acceso denegado.';
+                    return;
+                }
+                renderDashboard(datos);
+            };
+
+            const script = document.createElement('script');
+            script.src = `${APPS_SCRIPT_URL}?clave=${claveActual}&callback=${callbackName}`;
+            script.onerror = () => {
+                clearTimeout(timeout);
+                document.getElementById('cargando').textContent = 'Error al cargar datos. Intenta de nuevo.';
+            };
+            document.head.appendChild(script);
+        }
+
+        function renderDashboard(datos) {
+            const pedidos = datos.pedidos || [];
+            const analytics = datos.analytics || [];
+
+            // Stats generales
+            const hoy = new Date().toLocaleDateString('es-CO');
+            const pedidosHoy = pedidos.filter(p => String(p[0]).startsWith(hoy.split('/')[0]));
+            const totalRevelados = analytics.filter(a => a[3] === 'revelado').length;
+            const totalConfirmados = analytics.filter(a => a[3] === 'pedido_confirmado').length;
+            const conversion = totalRevelados > 0 ? Math.round((totalConfirmados / totalRevelados) * 100) : 0;
+
+            document.getElementById('stat-total').textContent = pedidos.length;
+            document.getElementById('stat-hoy').textContent = pedidos.filter(p => {
+                const fecha = String(p[0]);
+                const hoyStr = new Date().toLocaleDateString('es-CO');
+                return fecha.includes(hoyStr.split('/').reverse().join('/').substring(0, 5));
+            }).length;
+            document.getElementById('stat-revelados').textContent = totalRevelados;
+            document.getElementById('stat-conversion').textContent = conversion + '%';
+
+            // Analytics por producto
+            const nombresProductos = ['Corrector de Postura', 'Masajeador de Pies', 'Hombrera Térmica', 'Consola USB'];
+            const contenedor = document.getElementById('productos-analytics');
+            contenedor.innerHTML = '';
+
+            nombresProductos.forEach(nombre => {
+                const revelados = analytics.filter(a => a[2] === nombre && a[3] === 'revelado').length;
+                const formularios = analytics.filter(a => a[2] === nombre && a[3] === 'formulario_abierto').length;
+                const confirmados = analytics.filter(a => a[2] === nombre && a[3] === 'pedido_confirmado').length;
+                const convProducto = revelados > 0 ? Math.round((confirmados / revelados) * 100) : 0;
+
+                const card = document.createElement('div');
+                card.className = 'producto-stat';
+                card.innerHTML = `
+                    <p class="producto-stat-nombre">${nombre}</p>
+                    <div class="funnel-fila">
+                        <span class="funnel-label">Revelado / Clicks</span>
+                        <span class="funnel-valor">${revelados}</span>
+                    </div>
+                    <div class="funnel-fila">
+                        <span class="funnel-label">Formulario abierto</span>
+                        <span class="funnel-valor">${formularios}</span>
+                    </div>
+                    <div class="funnel-fila">
+                        <span class="funnel-label">Pedidos confirmados</span>
+                        <span class="funnel-valor">${confirmados}</span>
+                    </div>
+                    <div class="funnel-fila">
+                        <span class="funnel-label">Conversión</span>
+                        <span class="funnel-conversion">${convProducto}%</span>
+                    </div>
+                `;
+                contenedor.appendChild(card);
+            });
+
+            // Tabla pedidos (más recientes primero)
+            const tbody = document.getElementById('tabla-pedidos');
+            tbody.innerHTML = '';
+
+            if (pedidos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="sin-datos">Sin pedidos aún</td></tr>';
+            } else {
+                [...pedidos].reverse().forEach(p => {
+                    const tr = document.createElement('tr');
+                    const linkDropi = linksDropi[p[5]];
+                    const celdaProducto = linkDropi
+                        ? `<td><a href="${linkDropi}" target="_blank" style="color:var(--dorado-claro);font-weight:700;text-decoration:none">${p[5]} ↗</a></td>`
+                        : `<td style="color:var(--dorado-claro);font-weight:700">${p[5]}</td>`;
+                    tr.innerHTML = `
+                        <td>${p[0]}</td>
+                        <td>${p[1]}</td>
+                        <td>${p[2]}</td>
+                        <td>${p[3]}</td>
+                        <td>${p[4]}</td>
+                        ${celdaProducto}
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('cargando').classList.add('oculto');
+            document.getElementById('contenido-admin').classList.remove('oculto');
+        }
+    </script>
+</body>
+</html>
