@@ -11,6 +11,7 @@ const productos = [
         miniCopy: 'Para los que ya se acostumbraron al dolor sin darse cuenta.',
         categorias: ['ti', 'regalo'],
         imagen: 'img/corrector.png',
+        precio: '$89.900',
         linkDropi: 'https://app.dropi.co/dashboard/product-details/729188/corrector-postura-espalda-ralla-colores'
     },
     {
@@ -20,6 +21,7 @@ const productos = [
         miniCopy: 'El final del día que te mereces.',
         categorias: ['ti', 'hogar', 'regalo'],
         imagen: 'img/masajeador.png',
+        precio: '$99.900',
         linkDropi: 'https://app.dropi.co/dashboard/product-details/1722321/masajeador-pasiva-para-pies'
     },
     {
@@ -29,6 +31,7 @@ const productos = [
         miniCopy: 'Protección antes de que el daño decida por ti.',
         categorias: ['ti', 'regalo'],
         imagen: 'img/hombrera.png',
+        precio: '$119.900',
         linkDropi: 'https://app.dropi.co/dashboard/product-details/1941964/hombrera-termica-v8'
     },
     {
@@ -38,6 +41,7 @@ const productos = [
         miniCopy: 'Entretenimiento sin disculpas.',
         categorias: ['hogar', 'regalo'],
         imagen: 'img/consola.png',
+        precio: '$229.900',
         linkDropi: 'https://app.dropi.co/dashboard/product-details/650864/consola-retro-usb-20000-juegos-m8'
     }
 ];
@@ -249,6 +253,7 @@ function iniciarAleatorio() {
 
             document.getElementById('storytelling-texto').textContent = producto.storytelling;
             document.getElementById('producto-nombre').textContent = producto.nombre;
+            document.getElementById('producto-precio').textContent = producto.precio + ' · Domicilio incluido';
 
             const imgContainer = document.getElementById('producto-imagen');
             imgContainer.innerHTML = producto.imagen
@@ -288,6 +293,7 @@ function mostrarProductosDeCategoria(categoria, aleatorizar = false) {
             <div class="producto-card-info">
                 <p class="producto-card-nombre">${producto.nombre}</p>
                 <p class="producto-card-mini-copy">${producto.miniCopy}</p>
+                <p class="producto-card-precio">${producto.precio} · Domicilio incluido</p>
             </div>
         `;
         card.addEventListener('click', () => mostrarFormulario(producto, 'especifico'));

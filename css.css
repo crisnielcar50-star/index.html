@@ -340,6 +340,20 @@ html, body {
     text-transform: uppercase;
 }
 
+.producto-precio {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--dorado);
+    letter-spacing: 0.5px;
+}
+
+.producto-card-precio {
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: var(--dorado);
+    margin-top: 0.3rem;
+}
+
 /* ===== PANTALLA ESPECÍFICO ===== */
 .especifico-contenedor {
     display: flex;
