@@ -20,7 +20,7 @@ html, body {
     height: 100%;
     background-color: var(--negro);
     color: var(--blanco);
-    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Raleway', 'Helvetica Neue', Arial, sans-serif;
     overflow-x: hidden;
 }
 
@@ -110,9 +110,55 @@ html, body {
 .titulo-esfera {
     font-size: 1.8rem;
     font-weight: 900;
-    color: var(--dorado-claro);
+    font-family: 'Playfair Display', Georgia, serif;
     line-height: 1.2;
-    letter-spacing: -0.5px;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #f0d47a 0%, #C9A84C 50%, #a07820 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ===== CONTADOR Y SELLOS ===== */
+.contador-pedidos {
+    font-size: 0.8rem;
+    color: var(--gris);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    letter-spacing: 0.5px;
+}
+
+.contador-punto {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4CAF50;
+    box-shadow: 0 0 6px rgba(76, 175, 80, 0.7);
+    animation: parpadear 2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+#contador-numero {
+    color: var(--dorado-claro);
+    font-weight: 700;
+}
+
+.sellos-confianza {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.6rem;
+}
+
+.sello {
+    font-size: 0.72rem;
+    color: var(--gris);
+    border: 1px solid var(--gris-oscuro);
+    border-radius: 20px;
+    padding: 0.3rem 0.8rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 /* ===== ESFERA ===== */
@@ -210,8 +256,10 @@ html, body {
     cursor: pointer;
     border-radius: 8px;
     transition: all 0.3s ease;
-    letter-spacing: 0.3px;
-    font-family: inherit;
+    letter-spacing: 1px;
+    font-family: 'Raleway', inherit;
+    text-transform: uppercase;
+    font-size: 0.85rem;
 }
 
 .opcion-btn:hover, .opcion-btn:active {
@@ -219,7 +267,9 @@ html, body {
     color: var(--blanco);
     border-color: var(--dorado);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(201, 168, 76, 0.25);
+    box-shadow: 0 8px 20px rgba(201, 168, 76, 0.25),
+                0 0 20px rgba(201, 168, 76, 0.15),
+                0 0 40px rgba(201, 168, 76, 0.08);
 }
 
 .texto-toca {
@@ -300,9 +350,13 @@ html, body {
 .storytelling-texto {
     font-size: 1.6rem;
     font-weight: 900;
-    color: var(--dorado-claro);
+    font-family: 'Playfair Display', Georgia, serif;
     line-height: 1.2;
-    letter-spacing: -0.5px;
+    letter-spacing: 0.3px;
+    background: linear-gradient(135deg, #f0d47a 0%, #C9A84C 50%, #a07820 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .producto-imagen-wrapper {
@@ -369,8 +423,12 @@ html, body {
 .especifico-titulo {
     font-size: 2.5rem;
     font-weight: 900;
-    color: var(--dorado-claro);
-    letter-spacing: -1px;
+    font-family: 'Playfair Display', Georgia, serif;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #f0d47a 0%, #C9A84C 50%, #a07820 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .especifico-sub {

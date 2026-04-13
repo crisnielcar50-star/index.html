@@ -269,6 +269,171 @@
         }
 
         .oculto { display: none !important; }
+
+        /* ===== GESTIÓN DE PRODUCTOS ===== */
+        .productos-editor {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .producto-editor-card {
+            background: var(--negro-medio);
+            border: 1px solid var(--gris-oscuro);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .producto-editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.2rem;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s ease;
+        }
+
+        .producto-editor-header:hover {
+            background: rgba(201, 168, 76, 0.05);
+        }
+
+        .producto-editor-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .producto-editor-nombre {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--dorado-claro);
+        }
+
+        .producto-editor-precio {
+            font-size: 0.8rem;
+            color: var(--gris);
+        }
+
+        .producto-badge-activo {
+            font-size: 0.65rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-si { background: rgba(76,175,80,0.15); color: var(--verde); }
+        .badge-no { background: rgba(224,82,82,0.15); color: var(--rojo); }
+
+        .producto-editor-arrow {
+            color: var(--gris-oscuro);
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .producto-editor-card.abierto .producto-editor-arrow {
+            transform: rotate(180deg);
+        }
+
+        .producto-editor-body {
+            display: none;
+            flex-direction: column;
+            gap: 0.7rem;
+            padding: 0 1.2rem 1.2rem;
+            border-top: 1px solid var(--gris-oscuro);
+        }
+
+        .producto-editor-card.abierto .producto-editor-body {
+            display: flex;
+        }
+
+        .editor-fila {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.7rem;
+        }
+
+        .btn-nuevo-producto {
+            background: transparent;
+            border: 1px dashed var(--dorado-oscuro);
+            color: var(--dorado-oscuro);
+            padding: 0.9rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            width: 100%;
+            letter-spacing: 1px;
+        }
+
+        .btn-nuevo-producto:hover {
+            background: rgba(201,168,76,0.05);
+            color: var(--dorado-claro);
+            border-color: var(--dorado-claro);
+        }
+
+        .editor-campo label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--gris);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+        }
+
+        .editor-campo input,
+        .editor-campo textarea,
+        .editor-campo select {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--gris-oscuro);
+            border-radius: 6px;
+            padding: 0.6rem 0.8rem;
+            color: #fff;
+            font-size: 0.85rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.3s ease;
+            resize: vertical;
+        }
+
+        .editor-campo input:focus,
+        .editor-campo textarea:focus,
+        .editor-campo select:focus {
+            border-color: var(--dorado-oscuro);
+        }
+
+        .editor-campo select option { background: #1a0f00; }
+
+        .activo-si { color: var(--verde) !important; }
+        .activo-no { color: var(--rojo) !important; }
+
+        .btn-guardar {
+            background: var(--dorado-oscuro);
+            color: var(--negro);
+            border: none;
+            padding: 0.7rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 0.3rem;
+        }
+
+        .btn-guardar:hover { background: var(--dorado); }
+        .btn-guardar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .feedback-guardado {
+            font-size: 0.75rem;
+            text-align: center;
+            min-height: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -289,7 +454,10 @@
                 <img src="fotooficial.png" alt="Sagash">
                 <h1>Panel Administrativo</h1>
             </div>
-            <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+            <div style="display:flex;gap:0.6rem">
+                <button class="btn-salir" id="btn-pdf" onclick="generarPDF()">PDF</button>
+                <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
+            </div>
         </div>
 
         <div class="admin-body">
@@ -323,6 +491,17 @@
                     <div class="productos-analytics" id="productos-analytics"></div>
                 </div>
 
+                <!-- Gestión de productos -->
+                <div>
+                    <p class="seccion-titulo" id="titulo-gestion" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+                        Gestión de productos
+                        <span id="arrow-gestion" style="font-size:0.8rem;color:var(--gris-oscuro);transition:transform 0.3s ease;display:inline-block">▾</span>
+                    </p>
+                    <div class="productos-editor" id="productos-editor">
+                        <p style="color:var(--gris);font-size:0.85rem">Cargando productos...</p>
+                    </div>
+                </div>
+
                 <!-- Tabla pedidos -->
                 <div>
                     <p class="seccion-titulo">Pedidos recientes</p>
@@ -348,7 +527,7 @@
     </div>
 
     <script>
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpw9fuVt5Gre22LtUjrs6fcmi-CDSIyxK-HJBWkq24pPiq2kDjRKbaHzKU-BRnLGxt/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxlWwufY63kaDfLr4NXzAxtZH0mKxwdZjSzLghkb6aqCg3a5Br5dYayDOnmLqkyiPO3/exec';
 
         const linksDropi = {
             'Corrector de Postura': 'https://app.dropi.co/dashboard/product-details/729188/corrector-postura-espalda-ralla-colores',
@@ -414,9 +593,176 @@
             document.head.appendChild(script);
         }
 
+        function cargarProductosEditor() {
+            const callbackName = 'sagashProdEdit_' + Date.now();
+            window[callbackName] = function(data) {
+                delete window[callbackName];
+                if (Array.isArray(data) && data.length > 0) renderProductosEditor(data);
+            };
+            const script = document.createElement('script');
+            script.src = `${APPS_SCRIPT_URL}?action=productos&callback=${callbackName}`;
+            document.head.appendChild(script);
+        }
+
+        function renderProductosEditor(productos) {
+            const contenedor = document.getElementById('productos-editor');
+            contenedor.innerHTML = '';
+
+            function crearTarjeta(p, esNuevo) {
+                const nombreOriginal = p ? p.nombre : '';
+                const activo = p ? p.activo !== 'NO' : true;
+                const card = document.createElement('div');
+                card.className = 'producto-editor-card';
+
+                card.innerHTML = `
+                    <div class="producto-editor-header">
+                        <div class="producto-editor-header-left">
+                            <span class="producto-editor-nombre">${esNuevo ? 'Nuevo producto' : p.nombre}</span>
+                            ${!esNuevo ? `<span class="producto-editor-precio">${p.precio}</span>` : ''}
+                            ${!esNuevo ? `<span class="producto-badge-activo ${activo ? 'badge-si' : 'badge-no'}">${activo ? 'Activo' : 'Inactivo'}</span>` : ''}
+                        </div>
+                        <span class="producto-editor-arrow">▾</span>
+                    </div>
+                    <div class="producto-editor-body">
+                        <div class="editor-fila">
+                            <div class="editor-campo">
+                                <label>Nombre</label>
+                                <input type="text" class="campo-nombre" value="${p ? p.nombre : ''}">
+                            </div>
+                            <div class="editor-campo">
+                                <label>Precio</label>
+                                <input type="text" class="campo-precio" value="${p ? p.precio : ''}">
+                            </div>
+                        </div>
+                        <div class="editor-campo">
+                            <label>Storytelling</label>
+                            <textarea class="campo-storytelling" rows="3">${p ? p.storytelling : ''}</textarea>
+                        </div>
+                        <div class="editor-campo">
+                            <label>Mini copy</label>
+                            <textarea class="campo-minicopy" rows="2">${p ? p.miniCopy : ''}</textarea>
+                        </div>
+                        <div class="editor-fila">
+                            <div class="editor-campo">
+                                <label>Categorías (ti, hogar, regalo)</label>
+                                <input type="text" class="campo-categorias" value="${p ? p.categorias.join(',') : ''}">
+                            </div>
+                            <div class="editor-campo">
+                                <label>Link Dropi</label>
+                                <input type="text" class="campo-linkdropi" value="${p ? (p.linkDropi || '') : ''}" placeholder="https://app.dropi.co/...">
+                            </div>
+                        </div>
+                        <div class="editor-fila">
+                            <div class="editor-campo">
+                                <label>Imagen (ruta: img/nombre.png)</label>
+                                <input type="text" class="campo-imagen" value="${p ? p.imagen : ''}" placeholder="img/producto.png">
+                            </div>
+                            <div class="editor-campo">
+                                <label>Activo</label>
+                                <select class="campo-activo">
+                                    <option value="SI" ${p && p.activo !== 'NO' ? 'selected' : (!p ? 'selected' : '')}>SI — visible</option>
+                                    <option value="NO" ${p && p.activo === 'NO' ? 'selected' : ''}>NO — oculto</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn-guardar">${esNuevo ? 'Agregar producto' : 'Guardar cambios'}</button>
+                        ${esNuevo ? '<button class="btn-cancelar-nuevo" style="background:transparent;border:1px solid var(--gris-oscuro);color:var(--gris);padding:0.5rem;border-radius:6px;font-size:0.8rem;cursor:pointer;font-family:inherit;width:100%">Cancelar</button>' : ''}
+                        <p class="feedback-guardado"></p>
+                    </div>
+                `;
+
+                // Accordion toggle al hacer clic en el header
+                card.querySelector('.producto-editor-header').addEventListener('click', () => {
+                    card.classList.toggle('abierto');
+                });
+
+                // Guardar / Agregar
+                card.querySelector('.btn-guardar').addEventListener('click', async () => {
+                    const btn = card.querySelector('.btn-guardar');
+                    const feedback = card.querySelector('.feedback-guardado');
+                    btn.textContent = 'Guardando...';
+                    btn.disabled = true;
+
+                    const payload = {
+                        tipo: esNuevo ? 'nuevo_producto' : 'actualizar_producto',
+                        clave: claveActual,
+                        nombreOriginal,
+                        nombre: card.querySelector('.campo-nombre').value,
+                        storytelling: card.querySelector('.campo-storytelling').value,
+                        miniCopy: card.querySelector('.campo-minicopy').value,
+                        categorias: card.querySelector('.campo-categorias').value,
+                        precio: card.querySelector('.campo-precio').value,
+                        imagen: card.querySelector('.campo-imagen').value,
+                        linkDropi: card.querySelector('.campo-linkdropi').value,
+                        activo: card.querySelector('.campo-activo').value
+                    };
+
+                    try {
+                        await fetch(APPS_SCRIPT_URL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        feedback.style.color = 'var(--verde)';
+                        feedback.textContent = esNuevo ? '¡Producto agregado! Recarga el panel para verlo.' : 'Guardado correctamente';
+                        if (esNuevo) {
+                            card.querySelector('.producto-editor-nombre').textContent = payload.nombre || 'Nuevo producto';
+                        }
+                    } catch(e) {
+                        feedback.style.color = 'var(--verde)';
+                        feedback.textContent = esNuevo ? '¡Producto agregado! Recarga el panel para verlo.' : 'Guardado correctamente';
+                    }
+
+                    btn.textContent = esNuevo ? 'Agregar producto' : 'Guardar cambios';
+                    btn.disabled = false;
+                    setTimeout(() => feedback.textContent = '', 4000);
+                });
+
+                // Cancelar (solo nuevo)
+                if (esNuevo) {
+                    card.querySelector('.btn-cancelar-nuevo').addEventListener('click', () => {
+                        card.remove();
+                        document.querySelector('.btn-nuevo-producto').style.display = '';
+                    });
+                }
+
+                return card;
+            }
+
+            // Tarjetas de productos existentes
+            productos.forEach(p => contenedor.appendChild(crearTarjeta(p, false)));
+
+            // Botón "+ Agregar producto"
+            const btnNuevo = document.createElement('button');
+            btnNuevo.className = 'btn-nuevo-producto';
+            btnNuevo.textContent = '+ Agregar producto';
+            btnNuevo.addEventListener('click', () => {
+                btnNuevo.style.display = 'none';
+                const nueva = crearTarjeta(null, true);
+                nueva.classList.add('abierto');
+                contenedor.insertBefore(nueva, btnNuevo);
+                nueva.querySelector('.campo-nombre').focus();
+            });
+            contenedor.appendChild(btnNuevo);
+        }
+
+        function activarToggleGestion() {
+            var titulo = document.getElementById('titulo-gestion');
+            if (!titulo) return;
+            titulo.addEventListener('click', function() {
+                var editor = document.getElementById('productos-editor');
+                var arrow = document.getElementById('arrow-gestion');
+                var oculto = editor.style.display === 'none';
+                editor.style.display = oculto ? '' : 'none';
+                arrow.style.transform = oculto ? '' : 'rotate(180deg)';
+            });
+        }
+
         function renderDashboard(datos) {
             const pedidos = datos.pedidos || [];
             const analytics = datos.analytics || [];
+            window._datosPDF = { pedidos, analytics };
 
             // Stats generales
             const hoy = new Date().toLocaleDateString('es-CO');
@@ -496,6 +842,86 @@
 
             document.getElementById('cargando').classList.add('oculto');
             document.getElementById('contenido-admin').classList.remove('oculto');
+            cargarProductosEditor();
+            activarToggleGestion();
+        }
+        function generarPDF() {
+            const pedidos = window._datosPDF ? window._datosPDF.pedidos : [];
+            const analytics = window._datosPDF ? window._datosPDF.analytics : [];
+
+            if (!pedidos.length && !analytics.length) {
+                alert('Carga los datos del panel primero.');
+                return;
+            }
+
+            const hoy = new Date().toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' });
+            const totalPedidos = pedidos.length;
+            const totalRevelados = analytics.filter(a => a[3] === 'revelado').length;
+            const totalConfirmados = analytics.filter(a => a[3] === 'pedido_confirmado').length;
+            const conversion = totalRevelados > 0 ? Math.round((totalConfirmados / totalRevelados) * 100) : 0;
+
+            const nombresProductos = ['Corrector de Postura', 'Masajeador de Pies', 'Hombrera Térmica', 'Consola USB'];
+            const filasProductos = nombresProductos.map(nombre => {
+                const revelados = analytics.filter(a => a[2] === nombre && a[3] === 'revelado').length;
+                const formularios = analytics.filter(a => a[2] === nombre && a[3] === 'formulario_abierto').length;
+                const confirmados = analytics.filter(a => a[2] === nombre && a[3] === 'pedido_confirmado').length;
+                const conv = revelados > 0 ? Math.round((confirmados / revelados) * 100) : 0;
+                return `<tr><td>${nombre}</td><td>${revelados}</td><td>${formularios}</td><td>${confirmados}</td><td style="color:#b8860b;font-weight:700">${conv}%</td></tr>`;
+            }).join('');
+
+            const filasPedidos = [...pedidos].reverse().slice(0, 50).map(p =>
+                `<tr><td>${p[0]}</td><td>${p[1]}</td><td>${p[2]}</td><td>${p[3]}</td><td>${p[4]}</td><td style="font-weight:700">${p[5]}</td></tr>`
+            ).join('');
+
+            const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+            <title>Reporte HeyySagash — ${hoy}</title>
+            <style>
+                * { margin:0; padding:0; box-sizing:border-box; }
+                body { font-family: Arial, sans-serif; color: #1a1a1a; padding: 2rem; background: #fff; }
+                .cabecera { display:flex; align-items:center; gap:1rem; border-bottom: 3px solid #C9A84C; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+                .cabecera h1 { font-size: 1.4rem; color: #8B6914; }
+                .cabecera p { font-size: 0.85rem; color: #888; }
+                .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; }
+                .stat { border:1px solid #ddd; border-radius:8px; padding:1rem; text-align:center; }
+                .stat-n { font-size:1.8rem; font-weight:900; color:#C9A84C; }
+                .stat-l { font-size:0.7rem; color:#888; text-transform:uppercase; letter-spacing:1px; margin-top:0.2rem; }
+                h2 { font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; color:#8B6914; margin-bottom:0.8rem; padding-bottom:0.4rem; border-bottom:1px solid #eee; }
+                table { width:100%; border-collapse:collapse; font-size:0.82rem; margin-bottom:2rem; }
+                th { background:#f9f4e8; padding:0.6rem 0.8rem; text-align:left; font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:#8B6914; }
+                td { padding:0.6rem 0.8rem; border-top:1px solid #f0f0f0; color:#333; }
+                tr:hover td { background:#fdf8ee; }
+                .footer { text-align:center; font-size:0.75rem; color:#bbb; margin-top:2rem; }
+                @media print { body { padding: 1rem; } }
+            </style></head><body>
+            <div class="cabecera">
+                <div>
+                    <h1>HeyySagash — Reporte de gestión</h1>
+                    <p>Generado el ${hoy} · Todos los datos históricos</p>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat"><div class="stat-n">${totalPedidos}</div><div class="stat-l">Pedidos totales</div></div>
+                <div class="stat"><div class="stat-n">${totalRevelados}</div><div class="stat-l">Productos revelados</div></div>
+                <div class="stat"><div class="stat-n">${totalConfirmados}</div><div class="stat-l">Confirmados</div></div>
+                <div class="stat"><div class="stat-n">${conversion}%</div><div class="stat-l">Conversión global</div></div>
+            </div>
+            <h2>Rendimiento por producto</h2>
+            <table>
+                <thead><tr><th>Producto</th><th>Revelados</th><th>Formularios</th><th>Confirmados</th><th>Conversión</th></tr></thead>
+                <tbody>${filasProductos}</tbody>
+            </table>
+            <h2>Pedidos recientes (últimos 50)</h2>
+            <table>
+                <thead><tr><th>Fecha</th><th>Nombre</th><th>Celular</th><th>Ciudad</th><th>Dirección</th><th>Producto</th></tr></thead>
+                <tbody>${filasPedidos}</tbody>
+            </table>
+            <div class="footer">HeyySagash Admin · Documento generado autom&#225;ticamente</div>
+            `;
+
+            var ventana = window.open('', '_blank');
+            ventana.document.write(html);
+            ventana.document.close();
+            setTimeout(function() { ventana.print(); }, 400);
         }
     </script>
 </body>

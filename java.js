@@ -1,9 +1,11 @@
 // ===== CONFIGURACIÓN =====
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpw9fuVt5Gre22LtUjrs6fcmi-CDSIyxK-HJBWkq24pPiq2kDjRKbaHzKU-BRnLGxt/exec';
+// ACTUALIZAR con nueva URL después de reimplementar Apps Script
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxlWwufY63kaDfLr4NXzAxtZH0mKxwdZjSzLghkb6aqCg3a5Br5dYayDOnmLqkyiPO3/exec';
 const NUMERO_SOPORTE = '573242919434';
+const CACHE_TTL = 60 * 60 * 1000; // 1 hora
 
-// ===== PRODUCTOS =====
-const productos = [
+// ===== PRODUCTOS (fallback si falla el Sheet) =====
+const productosDefault = [
     {
         id: 'corrector',
         nombre: 'Corrector de Postura',
@@ -46,8 +48,52 @@ const productos = [
     }
 ];
 
+let productos = [...productosDefault];
 let productoActual = null;
 let flujoActual = null;
+
+// ===== CARGAR PRODUCTOS DESDE SHEET =====
+function cargarProductosDesdeSheet(urlScript) {
+    const cacheKey = 'sagash_productos';
+    const cacheTime = localStorage.getItem(cacheKey + '_time');
+    const cacheData = localStorage.getItem(cacheKey);
+
+    if (cacheData && cacheTime && (Date.now() - parseInt(cacheTime)) < CACHE_TTL) {
+        productos = JSON.parse(cacheData);
+        return;
+    }
+
+    const callbackName = 'sagashProd_' + Date.now();
+    window[callbackName] = function(data) {
+        delete window[callbackName];
+        if (Array.isArray(data) && data.length > 0) {
+            productos = data;
+            localStorage.setItem(cacheKey, JSON.stringify(data));
+            localStorage.setItem(cacheKey + '_time', Date.now().toString());
+        }
+    };
+
+    const script = document.createElement('script');
+    script.src = `${urlScript}?action=productos&callback=${callbackName}`;
+    document.head.appendChild(script);
+}
+
+// ===== CONTADOR DE PEDIDOS =====
+function iniciarContador() {
+    const hora = new Date().getHours();
+    let base = hora >= 18 ? 14 : hora >= 12 ? 9 : 5;
+    base += Math.floor(Math.random() * 4);
+
+    const el = document.getElementById('contador-numero');
+    if (el) el.textContent = base;
+
+    setInterval(() => {
+        if (Math.random() < 0.3) {
+            base += 1;
+            if (el) el.textContent = base;
+        }
+    }, 45000);
+}
 
 // ===== ANALYTICS =====
 function registrarEvento(flujo, producto, evento) {
@@ -123,6 +169,27 @@ function reproducirSonido() {
     } catch (e) {
         // Navegador sin soporte de audio — continúa sin sonido
     }
+}
+
+function reproducirSonidoEsfera() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(528, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(660, ctx.currentTime + 0.2);
+
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.5);
+    } catch (e) {}
 }
 
 function reproducirTick() {
@@ -306,6 +373,8 @@ function mostrarProductosDeCategoria(categoria, aleatorizar = false) {
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', () => {
     iniciarParticulas();
+    iniciarContador();
+    cargarProductosDesdeSheet(APPS_SCRIPT_URL);
 
     // Esfera
     const esfera = document.getElementById('esfera');
@@ -318,11 +387,15 @@ document.addEventListener('DOMContentLoaded', () => {
         esferaActivada = true;
         esfera.classList.add('activa');
         opcionesEsfera.classList.add('visible');
-        textoToca.classList.add('oculto');
+        textoToca.style.display = 'none';
     }
 
-    esfera.addEventListener('click', activarEsfera);
     esfera.addEventListener('mouseenter', activarEsfera);
+
+    esfera.addEventListener('click', () => {
+        reproducirSonidoEsfera();
+        activarEsfera();
+    });
 
     document.getElementById('btn-aleatorio').addEventListener('click', iniciarAleatorio);
 
