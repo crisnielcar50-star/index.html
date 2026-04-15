@@ -527,7 +527,7 @@
     </div>
 
     <script>
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxlWwufY63kaDfLr4NXzAxtZH0mKxwdZjSzLghkb6aqCg3a5Br5dYayDOnmLqkyiPO3/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby41ElkvoBfHzuNzZ0NhCfviloGiof5rAJxs3YKF72s7Oj0IBFh7QtHhSugPZ0t1wwf/exec';
 
         const linksDropi = {
             'Corrector de Postura': 'https://app.dropi.co/dashboard/product-details/729188/corrector-postura-espalda-ralla-colores',
@@ -621,7 +621,10 @@
                             ${!esNuevo ? `<span class="producto-editor-precio">${p.precio}</span>` : ''}
                             ${!esNuevo ? `<span class="producto-badge-activo ${activo ? 'badge-si' : 'badge-no'}">${activo ? 'Activo' : 'Inactivo'}</span>` : ''}
                         </div>
-                        <span class="producto-editor-arrow">▾</span>
+                        <div style="display:flex;align-items:center;gap:0.8rem">
+                            <button class="btn-eliminar" style="background:transparent;border:1px solid #e05252;color:#e05252;padding:0.25rem 0.6rem;border-radius:6px;font-size:0.7rem;cursor:pointer;font-family:inherit;font-weight:700;letter-spacing:0.5px">✕ Eliminar</button>
+                            <span class="producto-editor-arrow">▾</span>
+                        </div>
                     </div>
                     <div class="producto-editor-body">
                         <div class="editor-fila">
@@ -630,8 +633,8 @@
                                 <input type="text" class="campo-nombre" value="${p ? p.nombre : ''}">
                             </div>
                             <div class="editor-campo">
-                                <label>Precio</label>
-                                <input type="text" class="campo-precio" value="${p ? p.precio : ''}">
+                                <label>Precio (ej: $89.900)</label>
+                                <input type="text" class="campo-precio" value="${p ? p.precio : ''}" placeholder="$89.900">
                             </div>
                         </div>
                         <div class="editor-campo">
@@ -671,9 +674,31 @@
                     </div>
                 `;
 
-                // Accordion toggle al hacer clic en el header
-                card.querySelector('.producto-editor-header').addEventListener('click', () => {
+                // Accordion toggle al hacer clic en el header (no en el botón eliminar)
+                card.querySelector('.producto-editor-header').addEventListener('click', (e) => {
+                    if (e.target.closest('.btn-eliminar')) return;
                     card.classList.toggle('abierto');
+                });
+
+                // Eliminar producto
+                card.querySelector('.btn-eliminar').addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    if (esNuevo) { card.remove(); document.querySelector('.btn-nuevo-producto').style.display = ''; return; }
+                    if (!confirm('¿Eliminar "' + nombreOriginal + '"? Esto lo borra de la Sheet y de la página.')) return;
+                    const btn = card.querySelector('.btn-eliminar');
+                    btn.textContent = '...';
+                    btn.disabled = true;
+                    try {
+                        await fetch(APPS_SCRIPT_URL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ tipo: 'eliminar_producto', clave: claveActual, nombreOriginal })
+                        });
+                    } catch(e) {}
+                    localStorage.removeItem('sagash_productos');
+                    localStorage.removeItem('sagash_productos_time');
+                    card.remove();
                 });
 
                 // Guardar / Agregar
@@ -704,14 +729,18 @@
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(payload)
                         });
+                        localStorage.removeItem('sagash_productos');
+                        localStorage.removeItem('sagash_productos_time');
                         feedback.style.color = 'var(--verde)';
-                        feedback.textContent = esNuevo ? '¡Producto agregado! Recarga el panel para verlo.' : 'Guardado correctamente';
+                        feedback.textContent = esNuevo ? '¡Producto agregado! Ya se verá en la página.' : 'Guardado. Cambios visibles en la página.';
                         if (esNuevo) {
                             card.querySelector('.producto-editor-nombre').textContent = payload.nombre || 'Nuevo producto';
                         }
                     } catch(e) {
+                        localStorage.removeItem('sagash_productos');
+                        localStorage.removeItem('sagash_productos_time');
                         feedback.style.color = 'var(--verde)';
-                        feedback.textContent = esNuevo ? '¡Producto agregado! Recarga el panel para verlo.' : 'Guardado correctamente';
+                        feedback.textContent = esNuevo ? '¡Producto agregado! Ya se verá en la página.' : 'Guardado. Cambios visibles en la página.';
                     }
 
                     btn.textContent = esNuevo ? 'Agregar producto' : 'Guardar cambios';

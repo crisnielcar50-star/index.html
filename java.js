@@ -1,6 +1,6 @@
 // ===== CONFIGURACIÓN =====
 // ACTUALIZAR con nueva URL después de reimplementar Apps Script
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxlWwufY63kaDfLr4NXzAxtZH0mKxwdZjSzLghkb6aqCg3a5Br5dYayDOnmLqkyiPO3/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby41ElkvoBfHzuNzZ0NhCfviloGiof5rAJxs3YKF72s7Oj0IBFh7QtHhSugPZ0t1wwf/exec';
 const NUMERO_SOPORTE = '573242919434';
 const CACHE_TTL = 60 * 60 * 1000; // 1 hora
 
