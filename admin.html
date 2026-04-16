@@ -434,6 +434,30 @@
             text-align: center;
             min-height: 1rem;
         }
+
+        .categorias-checks {
+            display: flex;
+            gap: 1rem;
+            padding: 0.4rem 0;
+        }
+
+        .categorias-checks label {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: #ccc;
+            cursor: pointer;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .categorias-checks input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--dorado);
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -487,17 +511,20 @@
 
                 <!-- Analytics por producto -->
                 <div>
-                    <p class="seccion-titulo">Rendimiento por producto</p>
-                    <div class="productos-analytics" id="productos-analytics"></div>
+                    <p class="seccion-titulo" id="titulo-rendimiento" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+                        Rendimiento por producto
+                        <span id="arrow-rendimiento" style="font-size:0.8rem;color:var(--gris-oscuro);transition:transform 0.3s ease;display:inline-block;transform:rotate(-90deg)">▾</span>
+                    </p>
+                    <div class="productos-analytics" id="productos-analytics" style="display:none"></div>
                 </div>
 
                 <!-- Gestión de productos -->
                 <div>
                     <p class="seccion-titulo" id="titulo-gestion" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
                         Gestión de productos
-                        <span id="arrow-gestion" style="font-size:0.8rem;color:var(--gris-oscuro);transition:transform 0.3s ease;display:inline-block">▾</span>
+                        <span id="arrow-gestion" style="font-size:0.8rem;color:var(--gris-oscuro);transition:transform 0.3s ease;display:inline-block;transform:rotate(-90deg)">▾</span>
                     </p>
-                    <div class="productos-editor" id="productos-editor">
+                    <div class="productos-editor" id="productos-editor" style="display:none">
                         <p style="color:var(--gris);font-size:0.85rem">Cargando productos...</p>
                     </div>
                 </div>
@@ -535,20 +562,73 @@
             'Hombrera Térmica': 'https://app.dropi.co/dashboard/product-details/1941964/hombrera-termica-v8',
             'Consola USB': 'https://app.dropi.co/dashboard/product-details/650864/consola-retro-usb-20000-juegos-m8'
         };
-        const CLAVE_CORRECTA = 'sagash2025';
+        const CLAVE_CORRECTA = 'Dropi$agash#26';
         let claveActual = '';
+        let intentosFallidos = 0;
+        const MAX_INTENTOS = 5;
+        const BLOQUEO_MS = 5 * 60 * 1000; // 5 minutos
 
         // Enter para login
         document.getElementById('input-clave').addEventListener('keydown', e => {
             if (e.key === 'Enter') iniciarSesion();
         });
 
+        let bloqueoHasta = null;
+
         function iniciarSesion() {
-            const clave = document.getElementById('input-clave').value.trim();
+            const errEl = document.getElementById('error-login');
+            const inputEl = document.getElementById('input-clave');
+
+            // Verificar bloqueo activo
+            if (bloqueoHasta && Date.now() < bloqueoHasta) {
+                const segsRestantes = Math.ceil((bloqueoHasta - Date.now()) / 1000);
+                const mins = Math.floor(segsRestantes / 60);
+                const segs = segsRestantes % 60;
+                errEl.textContent = `Bloqueado. Intenta en ${mins}:${segs.toString().padStart(2,'0')}`;
+                errEl.style.display = 'block';
+                inputEl.disabled = true;
+                return;
+            } else if (bloqueoHasta && Date.now() >= bloqueoHasta) {
+                bloqueoHasta = null;
+                intentosFallidos = 0;
+                inputEl.disabled = false;
+            }
+
+            const clave = inputEl.value.trim();
             if (clave !== CLAVE_CORRECTA) {
-                document.getElementById('error-login').style.display = 'block';
+                intentosFallidos++;
+                const restantes = MAX_INTENTOS - intentosFallidos;
+                if (intentosFallidos >= MAX_INTENTOS) {
+                    bloqueoHasta = Date.now() + BLOQUEO_MS;
+                    inputEl.disabled = true;
+                    errEl.textContent = 'Demasiados intentos. Bloqueado por 5 minutos.';
+                    // Actualizar contador cada segundo
+                    const intervalo = setInterval(() => {
+                        if (Date.now() >= bloqueoHasta) {
+                            clearInterval(intervalo);
+                            bloqueoHasta = null;
+                            intentosFallidos = 0;
+                            inputEl.disabled = false;
+                            inputEl.value = '';
+                            errEl.style.display = 'none';
+                        } else {
+                            const segsRestantes = Math.ceil((bloqueoHasta - Date.now()) / 1000);
+                            const mins = Math.floor(segsRestantes / 60);
+                            const segs = segsRestantes % 60;
+                            errEl.textContent = `Bloqueado. Intenta en ${mins}:${segs.toString().padStart(2,'0')}`;
+                        }
+                    }, 1000);
+                } else {
+                    errEl.textContent = restantes === 1
+                        ? 'Clave incorrecta. 1 intento restante.'
+                        : `Clave incorrecta. ${restantes} intentos restantes.`;
+                }
+                errEl.style.display = 'block';
                 return;
             }
+
+            intentosFallidos = 0;
+            bloqueoHasta = null;
             claveActual = clave;
             document.getElementById('pantalla-login').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
@@ -647,8 +727,12 @@
                         </div>
                         <div class="editor-fila">
                             <div class="editor-campo">
-                                <label>Categorías (ti, hogar, regalo)</label>
-                                <input type="text" class="campo-categorias" value="${p ? p.categorias.join(',') : ''}">
+                                <label>Categorías</label>
+                                <div class="categorias-checks">
+                                    <label><input type="checkbox" class="check-ti" ${p && p.categorias.includes('ti') ? 'checked' : ''}> Para ti</label>
+                                    <label><input type="checkbox" class="check-hogar" ${p && p.categorias.includes('hogar') ? 'checked' : ''}> Tu hogar</label>
+                                    <label><input type="checkbox" class="check-regalo" ${p && p.categorias.includes('regalo') ? 'checked' : ''}> Un regalo</label>
+                                </div>
                             </div>
                             <div class="editor-campo">
                                 <label>Link Dropi</label>
@@ -715,7 +799,7 @@
                         nombre: card.querySelector('.campo-nombre').value,
                         storytelling: card.querySelector('.campo-storytelling').value,
                         miniCopy: card.querySelector('.campo-minicopy').value,
-                        categorias: card.querySelector('.campo-categorias').value,
+                        categorias: [card.querySelector('.check-ti').checked ? 'ti' : '', card.querySelector('.check-hogar').checked ? 'hogar' : '', card.querySelector('.check-regalo').checked ? 'regalo' : ''].filter(c => c).join(','),
                         precio: card.querySelector('.campo-precio').value,
                         imagen: card.querySelector('.campo-imagen').value,
                         linkDropi: card.querySelector('.campo-linkdropi').value,
@@ -759,7 +843,7 @@
                 return card;
             }
 
-            // Tarjetas de productos existentes
+            // Tarjetas de productos existentes — cerradas por defecto
             productos.forEach(p => contenedor.appendChild(crearTarjeta(p, false)));
 
             // Botón "+ Agregar producto"
@@ -778,14 +862,25 @@
 
         function activarToggleGestion() {
             var titulo = document.getElementById('titulo-gestion');
-            if (!titulo) return;
-            titulo.addEventListener('click', function() {
-                var editor = document.getElementById('productos-editor');
-                var arrow = document.getElementById('arrow-gestion');
-                var oculto = editor.style.display === 'none';
-                editor.style.display = oculto ? '' : 'none';
-                arrow.style.transform = oculto ? '' : 'rotate(180deg)';
-            });
+            if (titulo) {
+                titulo.addEventListener('click', function() {
+                    var editor = document.getElementById('productos-editor');
+                    var arrow = document.getElementById('arrow-gestion');
+                    var oculto = editor.style.display === 'none';
+                    editor.style.display = oculto ? '' : 'none';
+                    arrow.style.transform = oculto ? '' : 'rotate(180deg)';
+                });
+            }
+            var tituloR = document.getElementById('titulo-rendimiento');
+            if (tituloR) {
+                tituloR.addEventListener('click', function() {
+                    var analytics = document.getElementById('productos-analytics');
+                    var arrow = document.getElementById('arrow-rendimiento');
+                    var oculto = analytics.style.display === 'none';
+                    analytics.style.display = oculto ? '' : 'none';
+                    arrow.style.transform = oculto ? '' : 'rotate(180deg)';
+                });
+            }
         }
 
         function renderDashboard(datos) {
@@ -809,8 +904,9 @@
             document.getElementById('stat-revelados').textContent = totalRevelados;
             document.getElementById('stat-conversion').textContent = conversion + '%';
 
-            // Analytics por producto
-            const nombresProductos = ['Corrector de Postura', 'Masajeador de Pies', 'Hombrera Térmica', 'Consola USB'];
+            // Analytics por producto — dinámico
+            window._analyticsGlobal = analytics;
+            const nombresProductos = [...new Set(analytics.filter(a => a[2] && a[2] !== 'undefined' && a[2] !== '').map(a => a[2]))];
             const contenedor = document.getElementById('productos-analytics');
             contenedor.innerHTML = '';
 
