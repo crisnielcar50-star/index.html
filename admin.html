@@ -542,6 +542,7 @@
                                     <th>Ciudad</th>
                                     <th>Dirección</th>
                                     <th>Producto</th>
+                                    <th>Descuento</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-pedidos"></tbody>
@@ -554,7 +555,7 @@
     </div>
 
     <script>
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby41ElkvoBfHzuNzZ0NhCfviloGiof5rAJxs3YKF72s7Oj0IBFh7QtHhSugPZ0t1wwf/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw1Stwhwb1S3icxJH0jLGUVAgzP5HD3wruFkUKWDA5daQvzstFsJOnNJeZddQUhY10D/exec';
 
         const linksDropi = {
             'Corrector de Postura': 'https://app.dropi.co/dashboard/product-details/729188/corrector-postura-espalda-ralla-colores',
@@ -563,6 +564,7 @@
             'Consola USB': 'https://app.dropi.co/dashboard/product-details/650864/consola-retro-usb-20000-juegos-m8'
         };
         const CLAVE_CORRECTA = 'Dropi$agash#26';
+        const CLAVE_SHEETS = 'sagash2025';
         let claveActual = '';
         let intentosFallidos = 0;
         const MAX_INTENTOS = 5;
@@ -665,7 +667,7 @@
             };
 
             const script = document.createElement('script');
-            script.src = `${APPS_SCRIPT_URL}?clave=${claveActual}&callback=${callbackName}`;
+            script.src = `${APPS_SCRIPT_URL}?clave=${CLAVE_SHEETS}&callback=${callbackName}`;
             script.onerror = () => {
                 clearTimeout(timeout);
                 document.getElementById('cargando').textContent = 'Error al cargar datos. Intenta de nuevo.';
@@ -752,6 +754,12 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="editor-fila">
+                            <div class="editor-campo">
+                                <label>Unidades disponibles</label>
+                                <input type="number" class="campo-unidades" value="${p ? (p.unidades || 0) : 0}" min="0" placeholder="0">
+                            </div>
+                        </div>
                         <button class="btn-guardar">${esNuevo ? 'Agregar producto' : 'Guardar cambios'}</button>
                         ${esNuevo ? '<button class="btn-cancelar-nuevo" style="background:transparent;border:1px solid var(--gris-oscuro);color:var(--gris);padding:0.5rem;border-radius:6px;font-size:0.8rem;cursor:pointer;font-family:inherit;width:100%">Cancelar</button>' : ''}
                         <p class="feedback-guardado"></p>
@@ -777,7 +785,7 @@
                             method: 'POST',
                             mode: 'no-cors',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ tipo: 'eliminar_producto', clave: claveActual, nombreOriginal })
+                            body: JSON.stringify({ tipo: 'eliminar_producto', clave: CLAVE_SHEETS, nombreOriginal })
                         });
                     } catch(e) {}
                     localStorage.removeItem('sagash_productos');
@@ -794,7 +802,7 @@
 
                     const payload = {
                         tipo: esNuevo ? 'nuevo_producto' : 'actualizar_producto',
-                        clave: claveActual,
+                        clave: CLAVE_SHEETS,
                         nombreOriginal,
                         nombre: card.querySelector('.campo-nombre').value,
                         storytelling: card.querySelector('.campo-storytelling').value,
@@ -803,7 +811,8 @@
                         precio: card.querySelector('.campo-precio').value,
                         imagen: card.querySelector('.campo-imagen').value,
                         linkDropi: card.querySelector('.campo-linkdropi').value,
-                        activo: card.querySelector('.campo-activo').value
+                        activo: card.querySelector('.campo-activo').value,
+                        unidades: parseInt(card.querySelector('.campo-unidades').value) || 0
                     };
 
                     try {
@@ -960,6 +969,7 @@
                         <td>${p[3]}</td>
                         <td>${p[4]}</td>
                         ${celdaProducto}
+                        <td style="color:${p[6] && p[6] !== 'Sin descuento' ? '#22c55e' : '#ffffff44'};font-weight:600">${p[6] || 'Sin descuento'}</td>
                     `;
                     tbody.appendChild(tr);
                 });

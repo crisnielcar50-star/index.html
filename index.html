@@ -69,6 +69,7 @@
                 <div class="producto-imagen-contenedor" id="producto-imagen"></div>
                 <p class="producto-nombre" id="producto-nombre"></p>
                 <p class="producto-precio" id="producto-precio"></p>
+                <div class="urgencia-badges" id="urgencia-badges"></div>
             </div>
             <button class="boton-accion" id="btn-quiero">Lo quiero ahora →</button>
             <button class="boton-volver" id="btn-volver-aleatorio">← Volver a la esfera</button>
@@ -105,6 +106,48 @@
         </div>
     </section>
 
+    <!-- ====== BÚHO ====== -->
+    <div id="buho" style="display:none;position:fixed;font-size:2.8rem;cursor:pointer;z-index:9999;user-select:none;filter:drop-shadow(0 0 8px rgba(201,168,76,0.6));transition:top 0.5s ease">🦉</div>
+
+    <!-- ====== MODAL BÚHO ====== -->
+    <div id="modal-buho" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:10000;align-items:center;justify-content:center;">
+        <div style="background:#1a1200;border:1px solid #c9a96e44;border-radius:20px;padding:32px 28px;max-width:360px;width:90%;text-align:center;position:relative;">
+            <button onclick="cerrarBuho()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#ffffff44;font-size:1.2rem;cursor:pointer;">✕</button>
+
+            <!-- Estado 1: Rueda -->
+            <div id="buho-estado-rueda">
+                <div style="font-size:2rem;margin-bottom:8px">🦉</div>
+                <h3 style="color:#c9a96e;font-size:1.1rem;margin-bottom:4px">El búho te trae un regalo</h3>
+                <p style="color:#ffffff66;font-size:0.8rem;margin-bottom:24px">Gira la rueda y descubre tu descuento exclusivo</p>
+                <div style="position:relative;width:200px;height:200px;margin:0 auto 20px;">
+                    <canvas id="rueda-canvas" width="200" height="200"></canvas>
+                    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;background:#1a1200;border:2px solid #c9a96e;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                        <span style="color:#c9a96e;font-size:0.7rem;font-weight:900">GO</span>
+                    </div>
+                    <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);color:#c9a96e;font-size:1.4rem;">▼</div>
+                </div>
+                <button id="btn-girar" onclick="girarRueda()" style="background:#c9a96e;color:#0a0702;border:none;padding:12px 32px;border-radius:10px;font-size:0.95rem;font-weight:900;cursor:pointer;font-family:inherit;">Girar</button>
+            </div>
+
+            <!-- Estado 2: Formulario -->
+            <div id="buho-estado-form" style="display:none;">
+                <div style="font-size:2.5rem;margin-bottom:8px" id="buho-premio-emoji">🎉</div>
+                <h3 style="color:#c9a96e;font-size:1.3rem;margin-bottom:4px" id="buho-premio-texto">¡Ganaste 15% OFF!</h3>
+                <p style="color:#ffffff66;font-size:0.8rem;margin-bottom:20px">Déjanos tus datos y aplicamos el descuento ahora</p>
+                <input id="buho-email" type="email" placeholder="Tu email" style="width:100%;background:#0f0f0a;border:1px solid #ffffff22;border-radius:8px;padding:10px 14px;color:#fff;font-size:0.85rem;margin-bottom:10px;font-family:inherit;outline:none;">
+                <input id="buho-tel" type="tel" placeholder="Tu teléfono" style="width:100%;background:#0f0f0a;border:1px solid #ffffff22;border-radius:8px;padding:10px 14px;color:#fff;font-size:0.85rem;margin-bottom:16px;font-family:inherit;outline:none;">
+                <button onclick="reclamarDescuento()" style="width:100%;background:#c9a96e;color:#0a0702;border:none;padding:12px;border-radius:10px;font-size:0.95rem;font-weight:900;cursor:pointer;font-family:inherit;">Aplicar descuento</button>
+            </div>
+
+            <!-- Estado 3: Confirmación -->
+            <div id="buho-estado-ok" style="display:none;">
+                <div style="font-size:2.5rem;margin-bottom:12px">✓</div>
+                <h3 style="color:#c9a96e;font-size:1.2rem;margin-bottom:8px" id="buho-ok-texto">¡Descuento aplicado!</h3>
+                <p style="color:#ffffff88;font-size:0.82rem">Los precios ya muestran tu descuento. Válido esta sesión.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- ====== MODAL: FORMULARIO ====== -->
     <div id="modal-formulario" class="modal-overlay oculta">
         <div class="modal-contenido">
@@ -135,3 +178,4 @@
     <script src="java.js"></script>
 </body>
 </html>
+   

@@ -1,6 +1,20 @@
+// ===== ESTILOS URGENCIA =====
+(function() {
+    const s = document.createElement('style');
+    s.textContent = `
+        .urgencia-badges { display:flex; flex-direction:column; align-items:center; gap:8px; margin-top:10px; }
+        .badge-stock { background:#ff4d4d18; border:1px solid #ff4d4d55; color:#ff7070; border-radius:20px; padding:5px 14px; font-size:0.8rem; font-weight:600; letter-spacing:0.5px; }
+        .badge-timer { background:#c9a96e18; border:1px solid #c9a96e55; color:#c9a96e; border-radius:20px; padding:5px 14px; font-size:0.8rem; font-weight:600; letter-spacing:0.5px; }
+        .producto-card-urgencia { display:flex; flex-direction:column; gap:4px; margin-top:6px; }
+        .producto-card-stock { color:#ff7070; font-size:0.75rem; font-weight:600; }
+        .producto-card-timer { color:#c9a96e; font-size:0.75rem; }
+    `;
+    document.head.appendChild(s);
+})();
+
 // ===== CONFIGURACIÓN =====
 // ACTUALIZAR con nueva URL después de reimplementar Apps Script
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby41ElkvoBfHzuNzZ0NhCfviloGiof5rAJxs3YKF72s7Oj0IBFh7QtHhSugPZ0t1wwf/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw1Stwhwb1S3icxJH0jLGUVAgzP5HD3wruFkUKWDA5daQvzstFsJOnNJeZddQUhY10D/exec';
 const NUMERO_SOPORTE = '573242919434';
 const CACHE_TTL = 60 * 60 * 1000; // 1 hora
 
@@ -14,6 +28,7 @@ const productosDefault = [
         categorias: ['ti', 'regalo'],
         imagen: 'img/corrector.png',
         precio: '$89.900',
+        unidades: 4,
         linkDropi: 'https://app.dropi.co/dashboard/product-details/729188/corrector-postura-espalda-ralla-colores'
     },
     {
@@ -24,6 +39,7 @@ const productosDefault = [
         categorias: ['ti', 'hogar', 'regalo'],
         imagen: 'img/masajeador.png',
         precio: '$99.900',
+        unidades: 3,
         linkDropi: 'https://app.dropi.co/dashboard/product-details/1722321/masajeador-pasiva-para-pies'
     },
     {
@@ -34,6 +50,7 @@ const productosDefault = [
         categorias: ['ti', 'regalo'],
         imagen: 'img/hombrera.png',
         precio: '$119.900',
+        unidades: 5,
         linkDropi: 'https://app.dropi.co/dashboard/product-details/1941964/hombrera-termica-v8'
     },
     {
@@ -44,6 +61,7 @@ const productosDefault = [
         categorias: ['hogar', 'regalo'],
         imagen: 'img/consola.png',
         precio: '$229.900',
+        unidades: 2,
         linkDropi: 'https://app.dropi.co/dashboard/product-details/650864/consola-retro-usb-20000-juegos-m8'
     }
 ];
@@ -145,6 +163,54 @@ function iniciarParticulas() {
         requestAnimationFrame(animar);
     }
     animar();
+}
+
+// ===== TIMER EVERGREEN =====
+let timerInterval = null;
+
+function obtenerTimerFin() {
+    const key = 'sagash_timer_fin';
+    let fin = sessionStorage.getItem(key);
+    if (!fin || parseInt(fin) < Date.now()) {
+        const duracion = (2 + Math.random() * 2) * 60 * 60 * 1000; // 2-4 horas
+        fin = Date.now() + duracion;
+        sessionStorage.setItem(key, fin);
+    }
+    return parseInt(fin);
+}
+
+function formatearTimer(ms) {
+    if (ms <= 0) return '00:00:00';
+    const h = Math.floor(ms / 3600000);
+    const m = Math.floor((ms % 3600000) / 60000);
+    const s = Math.floor((ms % 60000) / 1000);
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function iniciarTimerEvergreen(elementoId) {
+    const el = document.getElementById(elementoId);
+    if (!el) return;
+    const fin = obtenerTimerFin();
+    function tick() {
+        const restante = fin - Date.now();
+        el.textContent = `Oferta termina en ${formatearTimer(restante)}`;
+        if (restante <= 0) sessionStorage.removeItem('sagash_timer_fin');
+    }
+    tick();
+    setInterval(tick, 1000);
+}
+
+function mostrarUrgencia(producto, contenedorId) {
+    const el = document.getElementById(contenedorId);
+    if (!el) return;
+    const unidades = producto.unidades;
+    let html = '';
+    if (unidades && unidades > 0) {
+        html += `<span class="badge-stock">Solo quedan ${unidades} unidades</span>`;
+    }
+    html += `<span class="badge-timer" id="timer-${contenedorId}">⏰ Cargando...</span>`;
+    el.innerHTML = html;
+    iniciarTimerEvergreen(`timer-${contenedorId}`);
 }
 
 // ===== SONIDO =====
@@ -253,7 +319,8 @@ async function enviarPedido(e) {
         celular: document.getElementById('input-celular').value.trim(),
         ciudad: document.getElementById('input-ciudad').value.trim(),
         direccion: document.getElementById('input-direccion').value.trim(),
-        producto: productoActual.nombre
+        producto: productoActual.nombre,
+        descuento: descuentoActivo ? descuentoActivo + '%' : 'Sin descuento'
     };
 
     try {
@@ -329,6 +396,8 @@ function iniciarAleatorio() {
 
             registrarEvento('aleatorio', producto.nombre, 'revelado');
             document.getElementById('btn-quiero').onclick = () => mostrarFormulario(producto, 'aleatorio');
+            mostrarUrgencia(producto, 'urgencia-badges');
+            if (descuentoActivo) setTimeout(aplicarDescuentoPrecios, 50);
 
             revelacion.classList.remove('oculta');
             revelacion.classList.add('fade-in');
@@ -353,6 +422,9 @@ function mostrarProductosDeCategoria(categoria, aleatorizar = false) {
     filtrados.forEach(producto => {
         const card = document.createElement('div');
         card.className = 'producto-card fade-in';
+        const timerId = 'timer-card-' + producto.nombre.replace(/\s/g,'');
+        const stockHtml = producto.unidades && producto.unidades > 0
+            ? `<span class="producto-card-stock">Solo quedan ${producto.unidades} unidades</span>` : '' ;
         card.innerHTML = `
             <div class="producto-card-imagen">
                 ${producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}">` : ''}
@@ -361,13 +433,195 @@ function mostrarProductosDeCategoria(categoria, aleatorizar = false) {
                 <p class="producto-card-nombre">${producto.nombre}</p>
                 <p class="producto-card-mini-copy">${producto.miniCopy}</p>
                 <p class="producto-card-precio">${producto.precio} · Domicilio incluido</p>
+                <div class="producto-card-urgencia">
+                    ${stockHtml}
+                    <span class="producto-card-timer" id="${timerId}">⏰ Cargando...</span>
+                </div>
             </div>
         `;
+        setTimeout(() => iniciarTimerEvergreen(timerId), 50);
         card.addEventListener('click', () => mostrarFormulario(producto, 'especifico'));
         grid.appendChild(card);
     });
 
     grid.classList.remove('oculta');
+    if (descuentoActivo) setTimeout(aplicarDescuentoPrecios, 50);
+}
+
+// ===== FASE BÚHO =====
+const PREMIOS = [
+    { label: '5% OFF',  valor: 5,  color: '#0f0f0a' },
+    { label: '10% OFF', valor: 10, color: '#1a1200' },
+    { label: '15% OFF', valor: 15, color: '#0f0f0a' },
+    { label: '20% OFF', valor: 20, color: '#1a1200' },
+    { label: '5% OFF',  valor: 5,  color: '#0f0f0a' },
+    { label: '10% OFF', valor: 10, color: '#1a1200' },
+    { label: '15% OFF', valor: 15, color: '#0f0f0a' },
+    { label: '20% OFF', valor: 20, color: '#1a1200' },
+];
+
+let descuentoActivo = parseInt(sessionStorage.getItem('sagash_descuento')) || 0;
+let buhoMostrado = sessionStorage.getItem('sagash_buho_visto') === '1';
+let anguloActual = 0;
+let premioBuho = null;
+
+function dibujarRueda() {
+    const canvas = document.getElementById('rueda-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const cx = 100, cy = 100, r = 95;
+    const segmentos = PREMIOS.length;
+    const angPorSeg = (2 * Math.PI) / segmentos;
+
+    ctx.clearRect(0, 0, 200, 200);
+
+    // Borde exterior dorado
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#c9a96e';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    PREMIOS.forEach((p, i) => {
+        const inicio = anguloActual + i * angPorSeg;
+        const fin = inicio + angPorSeg;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, inicio, fin);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        ctx.strokeStyle = '#c9a96e55';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(inicio + angPorSeg / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#c9a96e';
+        ctx.font = 'bold 12px Segoe UI';
+        ctx.fillText(p.label, r - 6, 5);
+        ctx.restore();
+    });
+}
+
+function girarRueda() {
+    const btn = document.getElementById('btn-girar');
+    btn.disabled = true;
+    const angPorSeg = (2 * Math.PI) / PREMIOS.length;
+    const anguloInicio = anguloActual;
+    const vueltasExtra = 5 + Math.random() * 3;
+    const anguloFinal = vueltasExtra * 2 * Math.PI + Math.random() * 2 * Math.PI;
+    const duracion = 3500;
+    const inicio = performance.now();
+
+    function animar(ahora) {
+        const t = Math.min((ahora - inicio) / duracion, 1);
+        const ease = 1 - Math.pow(1 - t, 4);
+        anguloActual = anguloInicio + anguloFinal * ease;
+        dibujarRueda();
+        if (t < 1) {
+            requestAnimationFrame(animar);
+        } else {
+            // Calcular qué segmento quedó en el puntero (arriba = -π/2)
+            const anguloNorm = (((-Math.PI / 2) - anguloActual) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+            const indiceReal = Math.floor(anguloNorm / angPorSeg) % PREMIOS.length;
+            premioBuho = PREMIOS[indiceReal];
+            setTimeout(() => mostrarFormBuho(), 600);
+        }
+    }
+    requestAnimationFrame(animar);
+}
+
+function mostrarFormBuho() {
+    document.getElementById('buho-estado-rueda').style.display = 'none';
+    document.getElementById('buho-estado-form').style.display = 'block';
+    document.getElementById('buho-premio-texto').textContent = `¡Ganaste ${premioBuho.label}!`;
+}
+
+function cerrarBuho() {
+    document.getElementById('modal-buho').style.display = 'none';
+}
+
+async function reclamarDescuento() {
+    const email = document.getElementById('buho-email').value.trim();
+    const tel = document.getElementById('buho-tel').value.trim();
+    if (!email || !tel) { alert('Completa email y teléfono'); return; }
+
+    sessionStorage.setItem('sagash_descuento', premioBuho.valor);
+    descuentoActivo = premioBuho.valor;
+
+    try {
+        await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tipo: 'lead', email, telefono: tel, descuento: premioBuho.valor })
+        });
+    } catch(e) {}
+
+    document.getElementById('buho-estado-form').style.display = 'none';
+    document.getElementById('buho-estado-ok').style.display = 'block';
+    document.getElementById('buho-ok-texto').textContent = `${premioBuho.label} aplicado a todos los precios`;
+
+    setTimeout(() => {
+        cerrarBuho();
+        aplicarDescuentoPrecios();
+    }, 2000);
+}
+
+function aplicarDescuentoPrecios() {
+    if (!descuentoActivo) return;
+    document.querySelectorAll('.producto-card-precio').forEach(el => {
+        const texto = el.textContent;
+        const match = texto.match(/[\d.]+/);
+        if (!match) return;
+        const original = parseFloat(match[0].replace('.', ''));
+        if (isNaN(original)) return;
+        const nuevo = Math.round(original * (1 - descuentoActivo / 100));
+        el.innerHTML = `<span style="text-decoration:line-through;color:#ffffff33;font-size:0.85em">${match[0]}</span> $${nuevo.toLocaleString('es-CO')} · Domicilio incluido`;
+    });
+
+    const precioEl = document.getElementById('producto-precio');
+    if (precioEl) {
+        const texto = precioEl.textContent;
+        const match = texto.match(/[\d.]+/);
+        if (match) {
+            const original = parseFloat(match[0].replace('.', ''));
+            const nuevo = Math.round(original * (1 - descuentoActivo / 100));
+            precioEl.innerHTML = `<span style="text-decoration:line-through;color:#ffffff33;font-size:0.85em">${match[0]}</span> $${nuevo.toLocaleString('es-CO')} · Domicilio incluido`;
+        }
+    }
+}
+
+function iniciarBuho() {
+    if (buhoMostrado) return;
+    setTimeout(() => {
+        const buho = document.getElementById('buho');
+        buho.style.display = 'block';
+        buho.style.top = (20 + Math.random() * 40) + '%';
+        buho.style.left = '-60px';
+        buho.style.transition = 'left 9s linear, top 1s ease';
+
+        setTimeout(() => { buho.style.left = '110vw'; }, 100);
+
+        setTimeout(() => {
+            buho.style.transition = 'left 9s linear, top 1s ease';
+            buho.style.left = '-60px';
+            buho.style.top = (20 + Math.random() * 40) + '%';
+        }, 9500);
+
+        setTimeout(() => { buho.style.left = '110vw'; }, 9700);
+
+        buho.addEventListener('click', () => {
+            buhoMostrado = true;
+            sessionStorage.setItem('sagash_buho_visto', '1');
+            buho.style.display = 'none';
+            const modal = document.getElementById('modal-buho');
+            modal.style.display = 'flex';
+            dibujarRueda();
+        });
+    }, 30000);
 }
 
 // ===== INIT =====
@@ -375,6 +629,8 @@ document.addEventListener('DOMContentLoaded', () => {
     iniciarParticulas();
     iniciarContador();
     cargarProductosDesdeSheet(APPS_SCRIPT_URL);
+    iniciarBuho();
+    if (descuentoActivo) aplicarDescuentoPrecios();
 
     // Esfera
     const esfera = document.getElementById('esfera');
