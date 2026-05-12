@@ -14,7 +14,7 @@
 
 // ===== CONFIGURACIÓN =====
 // ACTUALIZAR con nueva URL después de reimplementar Apps Script
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw1Stwhwb1S3icxJH0jLGUVAgzP5HD3wruFkUKWDA5daQvzstFsJOnNJeZddQUhY10D/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz5e9vRM0c2CWKRL8Bb66A2BjoT0w5C85a5J6l15UTR8tGz0dFzTYSRa89AXQ7ZrFB7/exec';
 const NUMERO_SOPORTE = '573242919434';
 const CACHE_TTL = 60 * 60 * 1000; // 1 hora
 
@@ -425,6 +425,9 @@ function mostrarProductosDeCategoria(categoria, aleatorizar = false) {
         const timerId = 'timer-card-' + producto.nombre.replace(/\s/g,'');
         const stockHtml = producto.unidades && producto.unidades > 0
             ? `<span class="producto-card-stock">Solo quedan ${producto.unidades} unidades</span>` : '' ;
+        const paginaProducto = producto.nombre.toLowerCase().includes('corrector') ? 'correctores_1.html' : null;
+        const verMasHtml = paginaProducto
+            ? `<a href="${paginaProducto}" onclick="event.stopPropagation()" style="color:var(--dorado,#c9a96e);font-size:0.75rem;font-weight:600;text-decoration:none;letter-spacing:0.5px;margin-top:4px;display:inline-block">Ver más →</a>` : '';
         card.innerHTML = `
             <div class="producto-card-imagen">
                 ${producto.imagen ? `<img src="${producto.imagen}" alt="${producto.nombre}">` : ''}
@@ -437,6 +440,7 @@ function mostrarProductosDeCategoria(categoria, aleatorizar = false) {
                     ${stockHtml}
                     <span class="producto-card-timer" id="${timerId}">⏰ Cargando...</span>
                 </div>
+                ${verMasHtml}
             </div>
         `;
         setTimeout(() => iniciarTimerEvergreen(timerId), 50);

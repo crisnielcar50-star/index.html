@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sagash · Consola Predictiva de Demanda</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #0a0702;
+            --bg-card: #150d00;
+            --bg-inner: #0a0702;
+            --gold: #C9A84C;
+            --gold-soft: rgba(201, 168, 76, 0.13);
+            --gold-line: rgba(201, 168, 76, 0.22);
+            --text: #ffffff;
+            --text-muted: rgba(255,255,255,0.55);
+            --text-soft: rgba(255,255,255,0.78);
+            --good: #6FCF97;
+            --warn: #E8A35E;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { background: var(--bg-deep); }
+        body {
+            font-family: 'Raleway', sans-serif;
+            color: var(--text);
+            padding: 20px;
+            min-height: 100vh;
+            background:
+                radial-gradient(ellipse at top, rgba(201,168,76,0.08), transparent 60%),
+                var(--bg-deep);
+        }
+        .container {
+            max-width: 1180px;
+            margin: auto;
+            background: var(--bg-card);
+            padding: 32px;
+            border-radius: 18px;
+            border: 1px solid var(--gold-line);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: fadeUp .6s ease both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* HEADER */
+        .header {
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 18px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 900;
+            line-height: 1.2;
+        }
+        .header h1 .dorado { color: var(--gold); }
+        .badge {
+            background: var(--gold-soft);
+            color: var(--gold);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 1px solid var(--gold);
+            display: inline-block;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .header p {
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-size: 14px;
+            max-width: 720px;
+        }
+        .status-pill {
+            font-size: 11px;
+            color: var(--gold);
+            background: var(--gold-soft);
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--gold-line);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        .pulse {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--good);
+            box-shadow: 0 0 0 0 rgba(111,207,151,0.6);
+            animation: pulse 1.6s infinite;
+        }
+        @keyframes pulse {
+            0%   { box-shadow: 0 0 0 0 rgba(111,207,151,0.6); }
+            70%  { box-shadow: 0 0 0 10px rgba(111,207,151,0); }
+            100% { box-shadow: 0 0 0 0 rgba(111,207,151,0); }
+        }
+
+        /* KPIs */
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .kpi {
+            background: var(--bg-inner);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--gold);
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 80px; height: 80px;
+            background: radial-gradient(circle, var(--gold-soft), transparent 70%);
+            pointer-events: none;
+        }
+        .kpi h4 {
+            color: var(--text-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+        .kpi p {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            font-weight: 900;
+            margin: 8px 0 4px 0;
+            color: var(--gold);
+        }
+        .kpi small {
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .kpi small.up { color: var(--good); }
+
+        /* GRID 2 */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        .card {
+            background: var(--bg-inner);
+            border: 1px solid var(--gold-line);
+            border-radius: 14px;
+            padding: 22px;
+        }
+        .card h3 {
+            color: var(--gold);
+            border-bottom: 1px solid var(--gold-line);
+            padding-bottom: 10px;
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card h3 .meta {
+            font-family: 'Raleway', sans-serif;
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* SIMULADOR */
+        .control-group { margin-bottom: 16px; }
+        .control-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-soft);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .control-group input[type="range"] {
+            width: 100%;
+            accent-color: var(--gold);
+        }
+        .live-val {
+            font-weight: 900;
+            color: var(--gold);
+            float: right;
+            font-family: 'Playfair Display', serif;
+            font-size: 15px;
+        }
+        .equation {
+            background: rgba(0,0,0,0.35);
+            border: 1px dashed var(--gold-line);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-family: 'Playfair Display', serif;
+            font-size: 13px;
+            color: var(--text-soft);
+            text-align: center;
+            margin: 8px 0 14px 0;
+            letter-spacing: 0.3px;
+        }
+        .equation .v { color: var(--gold); font-weight: 700; }
+
+        .result-strip {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: var(--gold-soft);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .result-strip span:first-child {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-soft);
+            font-weight: 700;
+        }
+        .result-strip span:last-child {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--gold);
+        }
+
+        /* IA Box */
+        .ai-box {
+            background: var(--gold-soft);
+            border-left: 4px solid var(--gold);
+            padding: 18px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .ai-box h4 {
+            color: var(--gold);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+        }
+        .ai-box p {
+            font-style: italic;
+            font-size: 13px;
+            color: rgba(255,255,255,0.85);
+            line-height: 1.65;
+        }
+
+        .explanation {
+            background: rgba(0,0,0,0.35);
+            border-left: 4px solid var(--gold);
+            padding: 14px 16px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            color: var(--text-soft);
+            line-height: 1.65;
+        }
+        .explanation strong { color: var(--gold); }
+
+        /* Tabla */
+        .table-wrap { overflow-x: auto; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 580px;
+        }
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--gold-line);
+            font-size: 13px;
+        }
+        th {
+            background: var(--gold);
+            color: var(--bg-deep);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 11px;
+        }
+        tbody tr { transition: background 0.2s ease; }
+        tbody tr:hover { background-color: var(--gold-soft); }
+        td.precio { color: var(--gold); font-weight: 700; }
+        td.demanda {
+            color: var(--gold);
+            font-weight: 900;
+            font-family: 'Playfair Display', serif;
+            font-size: 15px;
+        }
+        td.ingresos { color: var(--text); font-weight: 600; }
+
+        .footer-note {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--gold-line);
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+        .footer-note strong { color: var(--gold); }
+
+        /* Mobile */
+        @media (max-width: 820px) {
+            body { padding: 12px; }
+            .container { padding: 20px; }
+            .header h1 { font-size: 22px; }
+            .kpi-container { grid-template-columns: 1fr; }
+            .grid-2 { grid-template-columns: 1fr; gap: 18px; }
+            .kpi p { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ======================================================
+             HEADER
+             ====================================================== -->
+        <div class="header">
+            <div>
+                <h1>Sagash: <span class="dorado">Consola Predictiva de Demanda</span> <span class="badge">Machine Learning</span></h1>
+                <p>Dashboard automatizado generado por el pipeline <strong style="color:#C9A84C">Python + n8n + Gemini</strong> para la línea de correctores de postura.</p>
+            </div>
+            <div class="status-pill"><span class="pulse"></span><span id="status-text">Modelo activo</span></div>
+        </div>
+
+        <!-- ======================================================
+             KPIs
+             ====================================================== -->
+        <div class="kpi-container">
+            <div class="kpi">
+                <h4>Ingresos Totales Proyectados</h4>
+                <p id="kpi-ingresos">USD 0</p>
+                <small class="up">▲ Predicción mensual</small>
+            </div>
+            <div class="kpi">
+                <h4>Inversión Requerida en Stock</h4>
+                <p id="kpi-inversion">USD 0</p>
+                <small>Costo de inventario óptimo</small>
+            </div>
+            <div class="kpi">
+                <h4>Calidad del Modelo (R²)</h4>
+                <p id="kpi-r2">0.00</p>
+                <small id="kpi-r2-label">Ajuste del modelo</small>
+            </div>
+        </div>
+
+        <!-- ======================================================
+             SIMULADOR + IA
+             ====================================================== -->
+        <div class="grid-2">
+            <div class="card">
+                <h3>Simulador en Vivo del Modelo <span class="meta">Regresión Lineal</span></h3>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">
+                    Mueve los parámetros y observa cómo el algoritmo recalcula la demanda esperada en tiempo real:
+                </p>
+
+                <div class="control-group">
+                    <label>Precio de Venta <span id="p-val" class="live-val">USD 20</span></label>
+                    <input type="range" id="slider-precio" min="10" max="40" value="20" step="1">
+                </div>
+
+                <div class="control-group">
+                    <label>Inversión en Publicidad Digital <span id="m-val" class="live-val">USD 130</span></label>
+                    <input type="range" id="slider-mkt" min="20" max="300" value="130" step="5">
+                </div>
+
+                <div class="equation" id="eq">
+                    Demanda = <span class="v">30</span> + (<span class="v">−1.20</span> × Precio) + (<span class="v">0.45</span> × Marketing)
+                </div>
+
+                <div style="height: 200px; position: relative;">
+                    <canvas id="liveChart"></canvas>
+                </div>
+
+                <div class="result-strip">
+                    <span>Demanda predicha</span>
+                    <span><strong id="demand-out">0</strong> unidades</span>
+                </div>
+            </div>
+
+            <div class="card" style="display:flex; flex-direction:column; justify-content:space-between; gap:14px;">
+                <div>
+                    <h3>¿Dónde está la IA aquí? <span class="meta">Pipeline</span></h3>
+                    <div class="explanation">
+                        <strong>El cerebro matemático:</strong><br>
+                        El modelo de <strong>Regresión Lineal</strong> entrenado en Python descubrió los coeficientes que vinculan
+                        precio, publicidad y unidades vendidas. Este dashboard ejecuta esos coeficientes <strong>en vivo</strong>
+                        en el simulador. Cada slider que mueves dispara una predicción real del modelo entrenado.
+                    </div>
+                </div>
+
+                <div class="ai-box">
+                    <h4>Análisis del Agente IA Directivo</h4>
+                    <p id="ai-analysis">"Cargando recomendación estratégica..."</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================================================
+             TABLA DE PREDICCIONES
+             ====================================================== -->
+        <div class="card">
+            <h3>Predicciones por Modelo de Corrector <span class="meta">Datos del pipeline</span></h3>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">
+                Resultados procesados por el modelo predictivo de Python y enriquecidos por n8n:
+            </p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Modelo de Corrector</th>
+                            <th>Precio Sugerido</th>
+                            <th>Predicción Demanda</th>
+                            <th>Ingresos Proyectados</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-productos">
+                        <!-- generado por JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <strong>Sagash</strong> · Consola predictiva · Datos actualizados <span id="last-update">—</span>
+        </div>
+
+    </div>
+
+    <!-- ==========================================================
+         DATA INYECTADA POR n8n
+         ==========================================================
+         IMPORTANTE: en n8n reemplaza este bloque entero por:
+
+         window.dashboardData = {
+            kpis: {
+                ingresosProyectados: {{ $node["Summarize"].json.sum_Ingresos_Proyectados }},
+                inversionInventario: {{ $node["Summarize"].json.sum_Inversion_Inventario }}
+            },
+            productos: {{ JSON.stringify($node["Calculadora de Datos"].all().map(i => i.json)) }},
+            agenteIA: {{ JSON.stringify($node["Message a model"].json.content.parts[0].text) }},
+            modelo: { intercepto: 30, coefPrecio: -1.2, coefMkt: 0.45, rCuadrado: 0.87 }
+         };
+
+         Los valores por defecto de abajo permiten visualizar el dashboard
+         standalone (sin n8n) para presentaciones y pruebas.
+    -->
+    <script>
+        window.dashboardData = window.dashboardData || {
+            kpis: {
+                ingresosProyectados: 13420,
+                inversionInventario: 4185
+            },
+            productos: [
+                { Producto: "Restaurador Total",     Precio_Venta: 20, Demanda_Predicha: 152, Ingresos_Proyectados: 3040 },
+                { Producto: "Postura Active",        Precio_Venta: 25, Demanda_Predicha: 118, Ingresos_Proyectados: 2950 },
+                { Producto: "Ergo Slim",             Precio_Venta: 18, Demanda_Predicha: 165, Ingresos_Proyectados: 2970 },
+                { Producto: "Pro Sport",             Precio_Venta: 30, Demanda_Predicha: 95,  Ingresos_Proyectados: 2850 },
+                { Producto: "Discreto Daily",        Precio_Venta: 22, Demanda_Predicha: 73,  Ingresos_Proyectados: 1610 }
+            ],
+            agenteIA: "El modelo identifica al Ergo Slim y Restaurador Total como los productos con mayor elasticidad ante incremento de publicidad: cada USD invertido genera retorno superior al promedio. Recomiendo concentrar el 60% del presupuesto de marketing en estos dos SKUs y mantener el precio en el rango USD 18–22, donde la curva de ingresos se maximiza. Reducir stock del Discreto Daily un 25% para liberar capital.",
+            modelo: { intercepto: 30, coefPrecio: -1.2, coefMkt: 0.45, rCuadrado: 0.87 }
+        };
+    </script>
+
+    <!-- ==========================================================
+         LÓGICA DEL DASHBOARD
+         ========================================================== -->
+    <script>
+        const D = window.dashboardData;
+        const fmt = n => Number(n).toLocaleString('es-CO');
+
+        // ---------- KPIs ----------
+        document.getElementById('kpi-ingresos').textContent  = 'USD ' + fmt(D.kpis.ingresosProyectados);
+        document.getElementById('kpi-inversion').textContent = 'USD ' + fmt(D.kpis.inversionInventario);
+        document.getElementById('kpi-r2').textContent        = D.modelo.rCuadrado.toFixed(2);
+        document.getElementById('kpi-r2-label').textContent  =
+            D.modelo.rCuadrado >= 0.8 ? 'Ajuste excelente' :
+            D.modelo.rCuadrado >= 0.6 ? 'Ajuste sólido'   : 'Ajuste moderado';
+
+        // ---------- Análisis IA ----------
+        document.getElementById('ai-analysis').textContent = '"' + D.agenteIA + '"';
+
+        // ---------- Tabla ----------
+        const tbody = document.getElementById('tabla-productos');
+        tbody.innerHTML = D.productos.map(p => `
+            <tr>
+                <td>${p.Producto}</td>
+                <td class="precio">USD ${p.Precio_Venta}</td>
+                <td class="demanda">${p.Demanda_Predicha} unidades</td>
+                <td class="ingresos">USD ${fmt(p.Ingresos_Proyectados)}</td>
+            </tr>
+        `).join('');
+
+        // ---------- Ecuación dinámica ----------
+        const eqHTML = `Demanda = <span class="v">${D.modelo.intercepto}</span> + ` +
+                       `(<span class="v">${D.modelo.coefPrecio.toFixed(2)}</span> × Precio) + ` +
+                       `(<span class="v">${D.modelo.coefMkt.toFixed(2)}</span> × Marketing)`;
+        document.getElementById('eq').innerHTML = eqHTML;
+
+        // ---------- Última actualización ----------
+        document.getElementById('last-update').textContent =
+            new Date().toLocaleString('es-CO', { dateStyle:'long', timeStyle:'short' });
+
+        // ---------- Simulador + Curva de demanda ----------
+        const ctx = document.getElementById('liveChart').getContext('2d');
+
+        // Construye una curva: demanda vs precio (manteniendo marketing actual)
+        function curvaDemanda(mkt) {
+            const labels = [];
+            const data = [];
+            for (let p = 10; p <= 40; p += 2) {
+                labels.push('$' + p);
+                const d = Math.max(0,
+                    D.modelo.intercepto + (D.modelo.coefPrecio * p) + (D.modelo.coefMkt * mkt)
+                );
+                data.push(Math.round(d));
+            }
+            return { labels, data };
+        }
+
+        const initial = curvaDemanda(130);
+        const liveChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: initial.labels,
+                datasets: [
+                    {
+                        label: 'Curva de demanda predicha',
+                        data: initial.data,
+                        borderColor: '#C9A84C',
+                        backgroundColor: 'rgba(201,168,76,0.18)',
+                        fill: true,
+                        tension: 0.35,
+                        pointRadius: 0,
+                        borderWidth: 2.5
+                    },
+                    {
+                        label: 'Punto seleccionado',
+                        data: [],
+                        borderColor: '#ffffff',
+                        backgroundColor: '#ffffff',
+                        pointRadius: 7,
+                        pointHoverRadius: 9,
+                        showLine: false,
+                        pointBorderColor: '#C9A84C',
+                        pointBorderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 350 },
+                plugins: {
+                    legend: {
+                        labels: { color: '#ffffffaa', boxWidth: 12, font: { size: 11 } }
+                    },
+                    tooltip: {
+                        backgroundColor: '#150d00',
+                        borderColor: '#C9A84C',
+                        borderWidth: 1,
+                        titleColor: '#C9A84C',
+                        bodyColor: '#ffffff'
+                    }
+                },
+                scales: {
+                    y: {
+                        min: 0,
+                        title: { display: true, text: 'Unidades', color: '#ffffff66' },
+                        ticks: { color: '#ffffff88' },
+                        grid:  { color: 'rgba(201,168,76,0.13)' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Precio (USD)', color: '#ffffff66' },
+                        ticks: { color: '#ffffff88' },
+                        grid:  { color: 'rgba(201,168,76,0.06)' }
+                    }
+                }
+            }
+        });
+
+        function recalcularModelo() {
+            const precio = parseFloat(document.getElementById('slider-precio').value);
+            const mkt    = parseFloat(document.getElementById('slider-mkt').value);
+
+            document.getElementById('p-val').textContent = 'USD ' + precio;
+            document.getElementById('m-val').textContent = 'USD ' + mkt;
+
+            // demanda actual
+            let demanda = D.modelo.intercepto + (D.modelo.coefPrecio * precio) + (D.modelo.coefMkt * mkt);
+            demanda = Math.max(0, Math.round(demanda));
+            document.getElementById('demand-out').textContent = demanda;
+
+            // recalcular curva con el marketing nuevo
+            const nueva = curvaDemanda(mkt);
+            liveChart.data.labels = nueva.labels;
+            liveChart.data.datasets[0].data = nueva.data;
+
+            // marcador del punto actual
+            const punto = nueva.labels.map((lab, i) => {
+                const labelPrecio = parseFloat(lab.replace('$',''));
+                return labelPrecio === precio ? nueva.data[i] : null;
+            });
+            liveChart.data.datasets[1].data = punto;
+
+            liveChart.update();
+        }
+
+        document.getElementById('slider-precio').addEventListener('input', recalcularModelo);
+        document.getElementById('slider-mkt').addEventListener('input', recalcularModelo);
+        recalcularModelo();
+    </script>
+</body>
+</html>

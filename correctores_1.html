@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Correctores de Postura — HeyySagash</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Raleway:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ===== RESET & VARIABLES (mismo ADN que Sagash) ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --dorado: #C9A84C;
+            --dorado-claro: #e5c05b;
+            --dorado-oscuro: #8B6914;
+            --negro: #0a0702;
+            --negro-medio: #150d00;
+            --negro-suave: #1a1200;
+            --gris: #888888;
+            --gris-oscuro: #444444;
+            --blanco: #ffffff;
+        }
+
+        html, body {
+            background-color: var(--negro);
+            color: var(--blanco);
+            font-family: 'Raleway', 'Helvetica Neue', Arial, sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* ===== TIPOGRAFÍAS ===== */
+        h1, h2, h3 { font-family: 'Playfair Display', serif; font-weight: 900; line-height: 1.15; }
+
+        /* ===== CANVAS PARTÍCULAS ===== */
+        #canvas-particulas {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(10, 7, 2, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid #c9a84c22;
+            padding: 0.9rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-logo { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.25rem; color: var(--dorado); letter-spacing: 1px; text-decoration: none; }
+        .header-logo span { color: var(--blanco); }
+        .header-volver { color: var(--gris); text-decoration: none; font-size: 0.85rem; transition: color 0.3s; }
+        .header-volver:hover { color: var(--dorado); }
+
+        /* ===== SECCIONES ===== */
+        section { position: relative; z-index: 1; padding: 4rem 1.5rem; }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* ===== HERO ===== */
+        .hero { padding: 5rem 1.5rem 3rem; text-align: center; }
+        .hero-eyebrow {
+            display: inline-block;
+            color: var(--dorado);
+            font-size: 0.78rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #c9a84c44;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 1.5rem;
+            max-width: 850px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hero h1 em { font-style: italic; color: var(--dorado); }
+        .hero-sub {
+            font-size: clamp(1rem, 2vw, 1.15rem);
+            color: #ffffffaa;
+            max-width: 620px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+        .hero-sub strong { color: var(--blanco); font-weight: 600; }
+
+        /* ===== STORY (Isra Bravo style) ===== */
+        .story {
+            padding: 3rem 1.5rem;
+            background: linear-gradient(180deg, transparent 0%, #150d0044 50%, transparent 100%);
+        }
+        .story-bloque {
+            max-width: 680px;
+            margin: 0 auto;
+            font-size: clamp(1.05rem, 2vw, 1.2rem);
+            line-height: 1.8;
+            color: #ffffffcc;
+            font-weight: 300;
+        }
+        .story-bloque p { margin-bottom: 1.4rem; }
+        .story-bloque p.golpe {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.4rem;
+            color: var(--dorado);
+            text-align: center;
+            margin: 2rem 0;
+            font-weight: 700;
+        }
+        .story-bloque p.cierre {
+            font-weight: 600;
+            color: var(--blanco);
+        }
+
+        /* ===== SECCIÓN TÍTULO ===== */
+        .section-titulo {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .section-titulo .eyebrow {
+            color: var(--dorado);
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+        }
+        .section-titulo h2 {
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            margin-bottom: 0.8rem;
+        }
+        .section-titulo p {
+            color: #ffffff88;
+            max-width: 540px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* ===== PRODUCTOS GRID ===== */
+        .productos { padding: 4rem 1.5rem; }
+        .productos-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .productos-grid { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+        }
+
+        .producto-card {
+            background: linear-gradient(180deg, #150d00 0%, #0a0702 100%);
+            border: 1px solid #c9a84c22;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .producto-card:hover {
+            border-color: var(--dorado);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 60px -20px #c9a84c33;
+        }
+
+        .producto-numero {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #c9a84c22;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .producto-imagen {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #0a0702;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .producto-imagen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        .producto-card:hover .producto-imagen img { transform: scale(1.05); }
+
+        .producto-info { padding: 1.6rem 1.4rem 1.8rem; flex-grow: 1; display: flex; flex-direction: column; }
+
+        .producto-tag {
+            display: inline-block;
+            color: var(--dorado);
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+        }
+        .producto-nombre {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 900;
+            margin-bottom: 0.6rem;
+            color: var(--blanco);
+        }
+        .producto-descripcion {
+            font-size: 0.9rem;
+            color: #ffffff99;
+            line-height: 1.6;
+            margin-bottom: 1.2rem;
+            font-weight: 300;
+            flex-grow: 1;
+        }
+
+        .producto-bullets {
+            list-style: none;
+            margin-bottom: 1.4rem;
+        }
+        .producto-bullets li {
+            font-size: 0.82rem;
+            color: #ffffffbb;
+            padding: 0.35rem 0 0.35rem 1.3rem;
+            position: relative;
+        }
+        .producto-bullets li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--dorado);
+            font-weight: 900;
+        }
+
+        .producto-precio-wrap {
+            display: flex;
+            align-items: baseline;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+        .producto-precio {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            color: var(--dorado);
+            font-weight: 900;
+        }
+        .producto-precio-tachado {
+            color: #ffffff44;
+            text-decoration: line-through;
+            font-size: 0.95rem;
+        }
+
+        .producto-cta {
+            background: var(--dorado);
+            color: var(--negro);
+            border: none;
+            padding: 0.95rem;
+            border-radius: 10px;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 900;
+            font-size: 0.92rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            display: block;
+        }
+        .producto-cta:hover {
+            background: var(--dorado-claro);
+            transform: translateY(-2px);
+        }
+
+        /* ===== USO / EJEMPLOS ===== */
+        .uso { padding: 4rem 1.5rem; background: #0d0900; }
+
+        .uso-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        @media (min-width: 768px) {
+            .uso-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .uso-card {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            border: 1px solid #c9a84c1a;
+            border-radius: 14px;
+            background: #150d00;
+            transition: border-color 0.3s;
+        }
+        .uso-card:hover { border-color: var(--dorado); }
+
+        .uso-numero {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem;
+            color: var(--dorado);
+            font-weight: 900;
+            display: block;
+            line-height: 1;
+            margin-bottom: 0.8rem;
+        }
+        .uso-titulo {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--blanco);
+        }
+        .uso-desc {
+            font-size: 0.82rem;
+            color: #ffffff88;
+            font-weight: 300;
+            line-height: 1.5;
+        }
+
+        /* ===== ¿PARA QUIÉN ES? ===== */
+        .para-quien { padding: 4rem 1.5rem; }
+        .para-quien-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            max-width: 900px;
+            margin: 2rem auto 0;
+        }
+        @media (min-width: 640px) {
+            .para-quien-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .pq-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.2rem 1.3rem;
+            background: #150d00;
+            border: 1px solid #c9a84c1a;
+            border-radius: 12px;
+        }
+        .pq-icono {
+            color: var(--dorado);
+            font-size: 1.4rem;
+            line-height: 1;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .pq-texto { font-size: 0.9rem; color: #ffffffcc; line-height: 1.5; font-weight: 300; }
+        .pq-texto strong { color: var(--blanco); font-weight: 600; }
+
+        /* ===== TESTIMONIO / CIERRE ===== */
+        .cierre {
+            padding: 5rem 1.5rem;
+            text-align: center;
+            background: radial-gradient(ellipse at center, #1a120044 0%, transparent 70%);
+        }
+        .cierre h2 {
+            font-size: clamp(1.8rem, 4vw, 2.4rem);
+            max-width: 700px;
+            margin: 0 auto 1.5rem;
+        }
+        .cierre h2 em { color: var(--dorado); font-style: italic; }
+        .cierre p {
+            color: #ffffff99;
+            max-width: 560px;
+            margin: 0 auto 2rem;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+        .cierre-cta {
+            display: inline-block;
+            background: var(--dorado);
+            color: var(--negro);
+            padding: 1.1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 900;
+            text-decoration: none;
+            letter-spacing: 1.5px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        .cierre-cta:hover {
+            background: var(--dorado-claro);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px -10px #c9a84c66;
+        }
+
+        /* ===== SELLOS ===== */
+        .sellos {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-top: 2.5rem;
+        }
+        .sello {
+            border: 1px solid #c9a84c44;
+            color: var(--dorado);
+            padding: 0.5rem 1.1rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            padding: 2rem 1.5rem;
+            text-align: center;
+            color: #ffffff44;
+            font-size: 0.78rem;
+            border-top: 1px solid #c9a84c11;
+        }
+
+        /* ===== BOTÓN WHATSAPP FLOTANTE ===== */
+        .btn-soporte {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 52px;
+            height: 52px;
+            background: #25D366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            z-index: 100;
+            box-shadow: 0 8px 24px -4px #25D36677;
+            transition: transform 0.3s;
+        }
+        .btn-soporte:hover { transform: scale(1.1); }
+
+        /* ===== ANIMACIÓN FADE ===== */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== RESPONSIVE MOBILE ===== */
+        @media (max-width: 600px) {
+            .hero { padding: 3rem 1.2rem 2rem; }
+            .cierre { padding: 3.5rem 1.2rem; }
+            .uso { padding: 3rem 1.2rem; }
+            .hero h1 br, .cierre h2 br { display: none; }
+            .story-bloque p.golpe { font-size: 1.15rem; }
+            .header-logo { font-size: 1.1rem; }
+        }
+
+        @media (min-width: 480px) and (max-width: 767px) {
+            .uso-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (min-width: 540px) and (max-width: 767px) {
+            .productos-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas-particulas"></canvas>
+
+    <!-- Botón WhatsApp -->
+    <a href="https://wa.me/573242919434?text=Hola%2C%20me%20interesa%20un%20corrector%20de%20postura"
+       target="_blank" class="btn-soporte" title="Pedir por WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="26" height="26">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.121 1.533 5.851L.057 23.625a.75.75 0 00.921.921l5.773-1.476A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.713 9.713 0 01-4.953-1.355l-.355-.213-3.683.941.957-3.585-.233-.369A9.712 9.712 0 012.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/>
+        </svg>
+    </a>
+
+    <!-- HEADER -->
+    <header class="header">
+        <a href="index.html" class="header-logo">Heyy<span>Sagash</span></a>
+        <a href="index.html" class="header-volver">← Volver</a>
+    </header>
+
+    <!-- ====== HERO ====== -->
+    <section class="hero">
+        <div class="container">
+            <span class="hero-eyebrow">Correctores de Postura</span>
+            <h1>Lo notas cuando te miras al espejo de reojo.<br>Y luego haces como que <em>no pasa nada</em>.</h1>
+            <p class="hero-sub">
+                Los hombros caídos. La espalda curvada. Esa molestia entre los omóplatos que ya no se va con un masaje.
+                <strong> Tu cuerpo lleva meses pidiéndote ayuda.</strong> Y tú llevas meses ignorándolo.
+            </p>
+        </div>
+    </section>
+
+    <!-- ====== STORY (Isra Bravo style) ====== -->
+    <section class="story">
+        <div class="story-bloque fade-in">
+            <p>
+                Mira, te voy a contar algo rápido.
+            </p>
+            <p>
+                El 80% de la gente que ves en la calle camina mal. No es exageración, es estadística. Cuello adelantado mirando el celular, hombros enrollados de tanto teclado, lumbares rotas de tantas horas sentadas en una silla que nunca fue diseñada para un ser humano.
+            </p>
+            <p>
+                Y aquí viene lo gracioso: <strong>todos lo saben</strong>. Todos. Pero la mayoría espera a tener 50 años con una hernia para hacer algo al respecto.
+            </p>
+            <p class="golpe">"Total, ya me acostumbré al dolor."</p>
+            <p>
+                Eso es lo que se dicen. Como si acostumbrarse al dolor fuera una virtud y no una bandera roja gigante.
+            </p>
+            <p>
+                Tú no estás aquí por casualidad. Estás aquí porque ya lo intentaste todo: estiramientos en YouTube que duraron tres días, recordatorios en el celular que ignoraste, sillas ergonómicas carísimas que terminaron sirviéndote igual de mal.
+            </p>
+            <p class="cierre">
+                Y ahora estás buscando algo que <em>haga el trabajo por ti</em> mientras tu cabeza se ocupa de cosas más importantes. Bienvenido. Aquí abajo tienes tres opciones. Lee bien cuál es la tuya.
+            </p>
+        </div>
+    </section>
+
+    <!-- ====== PRODUCTOS ====== -->
+    <section class="productos" id="productos">
+        <div class="container">
+            <div class="section-titulo">
+                <div class="eyebrow">Tres Modelos · Una Misión</div>
+                <h2>Elige el que encaja con tu vida.</h2>
+                <p>No el más caro. No el más bonito. El que vas a usar todos los días sin pensarlo dos veces.</p>
+            </div>
+
+            <div class="productos-grid">
+
+                <!-- PRODUCTO 1: Restaurador Total -->
+                <div class="producto-card fade-in">
+                    <span class="producto-numero">01</span>
+                    <div class="producto-imagen">
+                        <img src="corrector1.png" alt="Corrector Restaurador Total">
+                    </div>
+                    <div class="producto-info">
+                        <span class="producto-tag">El Restaurador Total</span>
+                        <h3 class="producto-nombre">Soporte Integral</h3>
+                        <p class="producto-descripcion">
+                            Para el que ya no se aguanta. Cubre espalda alta, media y lumbar. Si llevas años cargado al computador y la espalda te grita cada noche, este es el tuyo.
+                        </p>
+                        <ul class="producto-bullets">
+                            <li>Soporte completo: hombros + lumbar</li>
+                            <li>Bandas dobles ajustables</li>
+                            <li>Ideal para dolor crónico</li>
+                            <li>Tela transpirable, no suda</li>
+                        </ul>
+                        <div class="producto-precio-wrap">
+                            <span class="producto-precio">$89.900</span>
+                            <span class="producto-precio-tachado">$129.900</span>
+                        </div>
+                        <button onclick="abrirModal('Corrector Restaurador Total — Soporte Integral', '$89.900')" class="producto-cta">Pedirlo ahora →</button>
+                    </div>
+                </div>
+
+                <!-- PRODUCTO 2: Discreto Diario -->
+                <div class="producto-card fade-in">
+                    <span class="producto-numero">02</span>
+                    <div class="producto-imagen">
+                        <img src="corrector2.png" alt="Corrector Discreto Diario">
+                    </div>
+                    <div class="producto-info">
+                        <span class="producto-tag">El Discreto Diario</span>
+                        <h3 class="producto-nombre">Soporte de Hombros</h3>
+                        <p class="producto-descripcion">
+                            Para el que quiere corregir sin que se le note. Se pone debajo de cualquier camiseta. Lo usas tres horas al día y tu espalda aprende sola lo que olvidó.
+                        </p>
+                        <ul class="producto-bullets">
+                            <li>Invisible bajo la ropa</li>
+                            <li>Se pone en 30 segundos</li>
+                            <li>Para postura encorvada leve-media</li>
+                            <li>Cómodo: lo olvidas que lo tienes puesto</li>
+                        </ul>
+                        <div class="producto-precio-wrap">
+                            <span class="producto-precio">$59.900</span>
+                            <span class="producto-precio-tachado">$89.900</span>
+                        </div>
+                        <button onclick="abrirModal('Corrector Discreto Diario — Soporte de Hombros', '$59.900')" class="producto-cta">Pedirlo ahora →</button>
+                    </div>
+                </div>
+
+                <!-- PRODUCTO 3: Estructurado X -->
+                <div class="producto-card fade-in">
+                    <span class="producto-numero">03</span>
+                    <div class="producto-imagen">
+                        <img src="corrector3.png" alt="Corrector Estructurado X">
+                    </div>
+                    <div class="producto-info">
+                        <span class="producto-tag">El Estructurado X</span>
+                        <h3 class="producto-nombre">Diseño en X</h3>
+                        <p class="producto-descripcion">
+                            Bandas elásticas en X que tiran los hombros hacia atrás sin sentirse rígido. Para gente activa, deportistas, jóvenes que quieren postura recta sin sentirse en un yeso.
+                        </p>
+                        <ul class="producto-bullets">
+                            <li>Diseño en X, ligero y flexible</li>
+                            <li>Para hombres y mujeres</li>
+                            <li>Permite movimiento natural</li>
+                            <li>Ideal para entrenar y trabajar</li>
+                        </ul>
+                        <div class="producto-precio-wrap">
+                            <span class="producto-precio">$69.900</span>
+                            <span class="producto-precio-tachado">$99.900</span>
+                        </div>
+                        <button onclick="abrirModal('Corrector Estructurado X — Diseño en X', '$69.900')" class="producto-cta">Pedirlo ahora →</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="sellos">
+                <div class="sello">Pago contra entrega</div>
+                <div class="sello">Envío Colombia</div>
+                <div class="sello">Garantía 30 días</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== CÓMO SE USA ====== -->
+    <section class="uso">
+        <div class="container">
+            <div class="section-titulo">
+                <div class="eyebrow">Cómo se usa</div>
+                <h2>Cuatro pasos. Treinta segundos.</h2>
+                <p>Si lo complicas, te lo vas a quitar a los tres días. Por eso lo hicimos así de simple.</p>
+            </div>
+
+            <div class="uso-grid">
+                <div class="uso-card fade-in">
+                    <span class="uso-numero">1</span>
+                    <h4 class="uso-titulo">Póntelo como una mochila</h4>
+                    <p class="uso-desc">Pasa los brazos por las correas. Igual que una mochila. Igual de fácil.</p>
+                </div>
+                <div class="uso-card fade-in">
+                    <span class="uso-numero">2</span>
+                    <h4 class="uso-titulo">Ajusta a tu cuerpo</h4>
+                    <p class="uso-desc">Tira las bandas frontales hasta sentir que los hombros se abren. Sin ahorcar, sin apretar de más.</p>
+                </div>
+                <div class="uso-card fade-in">
+                    <span class="uso-numero">3</span>
+                    <h4 class="uso-titulo">Empieza con 1 hora al día</h4>
+                    <p class="uso-desc">Tu espalda no aprende en un día. Empieza con 1h, sube a 2h en la segunda semana.</p>
+                </div>
+                <div class="uso-card fade-in">
+                    <span class="uso-numero">4</span>
+                    <h4 class="uso-titulo">Quítatelo y observa</h4>
+                    <p class="uso-desc">Verás que tu cuerpo recuerda la posición. En 30 días es automático. Esa es la magia.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== PARA QUIÉN ES ====== -->
+    <section class="para-quien">
+        <div class="container">
+            <div class="section-titulo">
+                <div class="eyebrow">¿Es para ti?</div>
+                <h2>Lee esto antes de comprar.</h2>
+                <p>No te quiero vender algo que no necesitas. Mira si te ves reflejado en al menos tres de estos puntos.</p>
+            </div>
+
+            <div class="para-quien-grid">
+                <div class="pq-item fade-in">
+                    <span class="pq-icono">→</span>
+                    <p class="pq-texto"><strong>Pasas más de 5 horas al día sentado.</strong> Trabajo, estudio, computador. Tu espalda olvidó qué es estar recta.</p>
+                </div>
+                <div class="pq-item fade-in">
+                    <span class="pq-icono">→</span>
+                    <p class="pq-texto"><strong>Te miras en una vitrina y te asusta lo encorvado que estás.</strong> Y al segundo te enderezas y se te olvida.</p>
+                </div>
+                <div class="pq-item fade-in">
+                    <span class="pq-icono">→</span>
+                    <p class="pq-texto"><strong>Te duele el cuello al final del día.</strong> O entre los omóplatos. O la lumbar al levantarte.</p>
+                </div>
+                <div class="pq-item fade-in">
+                    <span class="pq-icono">→</span>
+                    <p class="pq-texto"><strong>Has intentado "acordarte" de sentarte recto.</strong> Y te dura 4 minutos antes de volver a encorvarte sin darte cuenta.</p>
+                </div>
+                <div class="pq-item fade-in">
+                    <span class="pq-icono">→</span>
+                    <p class="pq-texto"><strong>Quieres verte más alto y más seguro.</strong> Sin trucos. La postura cambia cómo te ves y cómo te ven.</p>
+                </div>
+                <div class="pq-item fade-in">
+                    <span class="pq-icono">→</span>
+                    <p class="pq-texto"><strong>Tienes menos de 60 años y ya pareces de 70 caminando.</strong> Aún estás a tiempo. Pero no infinitamente a tiempo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ====== CIERRE ====== -->
+    <section class="cierre">
+        <div class="container">
+            <h2>La diferencia entre quien cambia su postura y quien no, no es la <em>genética</em>.<br>Es haber decidido empezar.</h2>
+            <p>
+                Llevas meses pensándolo. Hoy puedes terminarlo. Pago contra entrega, llega a tu casa,
+                te lo pruebas, te lo pones. Si en 30 días no sientes la diferencia, te devolvemos el dinero. Sin preguntas.
+            </p>
+            <a href="#productos" class="cierre-cta">Quiero el mío ahora</a>
+        </div>
+    </section>
+
+    <footer>
+        © HeyySagash · Tu bienestar, nuestra pasión
+    </footer>
+
+    <!-- ===== MODAL PEDIDO ===== -->
+    <div id="modal-pedido" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:10000;align-items:center;justify-content:center;padding:1rem;">
+        <div style="background:#1a1200;border:1px solid #c9a84c44;border-radius:20px;padding:32px 28px;max-width:420px;width:100%;position:relative;max-height:90vh;overflow-y:auto;">
+            <button onclick="cerrarModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;color:#ffffff44;font-size:1.3rem;cursor:pointer;line-height:1;">✕</button>
+
+            <!-- Form -->
+            <div id="modal-form-estado">
+                <div style="font-size:1.8rem;margin-bottom:8px">📦</div>
+                <h3 id="modal-titulo-prod" style="color:#c9a84c;font-size:1rem;margin-bottom:4px;line-height:1.3"></h3>
+                <p id="modal-precio-prod" style="color:#c9a84c;font-size:1.3rem;font-weight:900;margin-bottom:4px"></p>
+                <p style="color:#ffffff55;font-size:0.78rem;margin-bottom:20px">Pago contra entrega · Sin riesgo</p>
+                <input id="frm-nombre" type="text" placeholder="Nombre completo" autocomplete="name" style="width:100%;background:#0f0f0a;border:1px solid #ffffff1a;border-radius:8px;padding:11px 14px;color:#fff;font-size:0.88rem;margin-bottom:9px;font-family:inherit;outline:none;">
+                <input id="frm-celular" type="tel" placeholder="Celular (ej: 3001234567)" autocomplete="tel" style="width:100%;background:#0f0f0a;border:1px solid #ffffff1a;border-radius:8px;padding:11px 14px;color:#fff;font-size:0.88rem;margin-bottom:9px;font-family:inherit;outline:none;">
+                <input id="frm-ciudad" type="text" placeholder="Ciudad" autocomplete="address-level2" style="width:100%;background:#0f0f0a;border:1px solid #ffffff1a;border-radius:8px;padding:11px 14px;color:#fff;font-size:0.88rem;margin-bottom:9px;font-family:inherit;outline:none;">
+                <input id="frm-direccion" type="text" placeholder="Dirección completa" autocomplete="street-address" style="width:100%;background:#0f0f0a;border:1px solid #ffffff1a;border-radius:8px;padding:11px 14px;color:#fff;font-size:0.88rem;margin-bottom:9px;font-family:inherit;outline:none;">
+                <input id="frm-correo" type="email" placeholder="Tu correo (recibirás confirmación)" autocomplete="email" style="width:100%;background:#0f0f0a;border:1px solid #ffffff1a;border-radius:8px;padding:11px 14px;color:#fff;font-size:0.88rem;margin-bottom:14px;font-family:inherit;outline:none;">
+                <p id="frm-error" style="color:#e05252;font-size:0.78rem;margin-bottom:8px;display:none;"></p>
+                <button onclick="enviarPedidoCorrecto()" id="btn-enviar-cor" style="width:100%;background:#c9a84c;color:#0a0702;border:none;padding:13px;border-radius:10px;font-size:0.95rem;font-weight:900;cursor:pointer;font-family:inherit;transition:opacity 0.2s;">Confirmar pedido →</button>
+                <p style="color:#ffffff33;font-size:0.72rem;text-align:center;margin-top:8px">Recibirás un correo de confirmación</p>
+            </div>
+
+            <!-- Éxito -->
+            <div id="modal-ok-estado" style="display:none;text-align:center;padding:1rem 0;">
+                <div style="font-size:3.5rem;margin-bottom:16px;">✓</div>
+                <h3 style="color:#c9a84c;font-size:1.2rem;margin-bottom:10px;">¡Pedido recibido!</h3>
+                <p style="color:#ffffff88;font-size:0.88rem;line-height:1.7;">En menos de 24 horas te contactamos<br>para confirmar tu envío.<br><span style="color:#c9a84c55;font-size:0.8rem;">Revisa tu correo — ahí tienes los detalles.</span></p>
+                <button onclick="cerrarModal()" style="margin-top:22px;background:transparent;border:1px solid #c9a84c44;color:#c9a84c88;padding:9px 22px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.85rem;">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const APPS_URL_COR = 'https://script.google.com/macros/s/AKfycbz5e9vRM0c2CWKRL8Bb66A2BjoT0w5C85a5J6l15UTR8tGz0dFzTYSRa89AXQ7ZrFB7/exec';
+        let _productoModal = '';
+
+        function abrirModal(producto, precio) {
+            _productoModal = producto;
+            document.getElementById('modal-titulo-prod').textContent = producto;
+            document.getElementById('modal-precio-prod').textContent = precio;
+            document.getElementById('modal-form-estado').style.display = '';
+            document.getElementById('modal-ok-estado').style.display = 'none';
+            document.getElementById('frm-error').style.display = 'none';
+            ['frm-nombre','frm-celular','frm-ciudad','frm-direccion','frm-correo'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('modal-pedido').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-pedido').style.display = 'none';
+        }
+
+        document.getElementById('modal-pedido').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModal();
+        });
+
+        async function enviarPedidoCorrecto() {
+            const nombre = document.getElementById('frm-nombre').value.trim();
+            const celular = document.getElementById('frm-celular').value.trim();
+            const ciudad = document.getElementById('frm-ciudad').value.trim();
+            const direccion = document.getElementById('frm-direccion').value.trim();
+            const correo = document.getElementById('frm-correo').value.trim();
+            const errEl = document.getElementById('frm-error');
+
+            if (!nombre || !celular || !ciudad || !direccion || !correo) {
+                errEl.textContent = 'Completa todos los campos';
+                errEl.style.display = '';
+                return;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+                errEl.textContent = 'Ingresa un correo válido';
+                errEl.style.display = '';
+                return;
+            }
+            errEl.style.display = 'none';
+
+            const btn = document.getElementById('btn-enviar-cor');
+            btn.textContent = 'Enviando...';
+            btn.style.opacity = '0.6';
+            btn.disabled = true;
+
+            try {
+                await fetch(APPS_URL_COR, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tipo: 'pedido_corrector', producto: _productoModal, nombre, celular, ciudad, direccion, correo })
+                });
+            } catch(e) {}
+
+            document.getElementById('modal-form-estado').style.display = 'none';
+            document.getElementById('modal-ok-estado').style.display = '';
+            btn.textContent = 'Confirmar pedido →';
+            btn.style.opacity = '1';
+            btn.disabled = false;
+        }
+
+        // ===== Partículas (mismo estilo que tu Sagash) =====
+        const canvas = document.getElementById('canvas-particulas');
+        const ctx = canvas.getContext('2d');
+        let particulas = [];
+        const TOTAL_PART = 40;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        class Particula {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5 + 0.5;
+                this.speedY = Math.random() * 0.3 + 0.1;
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                this.y -= this.speedY;
+                if (this.y < 0) {
+                    this.y = canvas.height;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(201, 168, 76, ${this.opacity})`;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < TOTAL_PART; i++) particulas.push(new Particula());
+
+        function animar() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particulas.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animar);
+        }
+        animar();
+
+        // ===== Fade-in al hacer scroll =====
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+
+</body>
+</html>
