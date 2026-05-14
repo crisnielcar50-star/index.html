@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sagash Intelligence — Demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0f0f1a;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    color: #fff;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border-bottom: 1px solid #c9a96e33;
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  header h1 { color: #c9a96e; font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; }
+  header .version {
+    background: #c9a96e22; color: #c9a96e;
+    border: 1px solid #c9a96e55; border-radius: 20px;
+    padding: 3px 12px; font-size: 0.75rem; letter-spacing: 1px;
+  }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+
+  /* ── API KEY SETUP ── */
+  #setup-bar {
+    background: #1a1a2e;
+    border-bottom: 1px solid #ffffff11;
+    padding: 12px 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  #setup-bar label { color: #ffffff66; font-size: 0.8rem; white-space: nowrap; }
+
+  #api-key-input {
+    flex: 1;
+    max-width: 420px;
+    background: #0f0f1a;
+    border: 1px solid #ffffff22;
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-family: monospace;
+  }
+
+  #api-key-input:focus { outline: none; border-color: #c9a96e55; }
+
+  .btn-conectar {
+    background: #c9a96e22;
+    border: 1px solid #c9a96e55;
+    color: #c9a96e;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    transition: all 0.2s;
+  }
+  .btn-conectar:hover { background: #c9a96e33; }
+
+  #status-api {
+    font-size: 0.78rem;
+    color: #ffffff44;
+  }
+  #status-api.ok { color: #22c55e; }
+  #status-api.err { color: #ef4444; }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: #1a1a2e;
+    border: 1px solid #ffffff11;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid #ffffff0a;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .card-icon {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+  }
+
+  .icon-blue   { background: #1e3a5f; border: 1px solid #3b82f644; }
+  .icon-green  { background: #1e3a2f; border: 1px solid #22c55e44; }
+  .icon-gold   { background: #3a1a00; border: 1px solid #c9a96e44; }
+
+  .card-title { font-size: 0.95rem; font-weight: 600; color: #ffffffdd; }
+  .card-mod   { font-size: 0.7rem; color: #ffffff44; margin-top: 2px; }
+
+  .card-body { padding: 18px 20px; flex: 1; }
+
+  .card-desc {
+    color: #ffffff66;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .btn-run {
+    width: 100%;
+    padding: 11px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-blue  { background: #3b82f622; color: #3b82f6; border: 1px solid #3b82f633; }
+  .btn-blue:hover  { background: #3b82f633; }
+  .btn-green { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e33; }
+  .btn-green:hover { background: #22c55e33; }
+  .btn-gold  { background: #c9a96e22; color: #c9a96e; border: 1px solid #c9a96e33; }
+  .btn-gold:hover  { background: #c9a96e33; }
+
+  .btn-run:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── OUTPUT ── */
+  .output-box {
+    margin-top: 14px;
+    background: #0f0f1a;
+    border: 1px solid #ffffff0a;
+    border-radius: 10px;
+    padding: 14px;
+    min-height: 80px;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: #ffffffbb;
+    display: none;
+    white-space: pre-wrap;
+  }
+
+  .output-box.visible { display: block; }
+
+  .output-box .loading {
+    color: #ffffff44;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid #ffffff22;
+    border-top-color: #c9a96e;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── SCORE DISPLAY ── */
+  #score-display {
+    margin-top: 16px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #score-display.visible { display: flex; }
+
+  .score-number {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #c9a96e;
+    line-height: 1;
+  }
+
+  .score-label { color: #ffffff44; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
+
+  .score-bar-wrap {
+    width: 100%;
+    background: #ffffff11;
+    border-radius: 999px;
+    height: 8px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+
+  .score-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #c9a96e, #f0c070);
+    border-radius: 999px;
+    transition: width 1.5s ease;
+    width: 0%;
+  }
+
+  /* ── FOOTER CARD (full width) ── */
+  .card-full {
+    grid-column: 1 / -1;
+    background: #1a1a2e;
+    border: 1px solid #c9a96e22;
+    border-radius: 16px;
+    padding: 24px 28px;
+  }
+
+  .card-full h3 {
+    color: #c9a96e;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .log-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .log-item {
+    font-size: 0.78rem;
+    color: #ffffff55;
+    display: flex;
+    gap: 10px;
+  }
+
+  .log-time { color: #ffffff22; font-family: monospace; }
+  .log-mod  { padding: 1px 8px; border-radius: 4px; font-size: 0.7rem; }
+  .log-blue  { background: #3b82f622; color: #3b82f6; }
+  .log-green { background: #22c55e22; color: #22c55e; }
+  .log-gold  { background: #c9a96e22; color: #c9a96e; }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: #ffffff22;
+    font-size: 0.72rem;
+    border-top: 1px solid #ffffff08;
+  }
+</style>
+    <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+
+<header>
+  <div>
+    <div style="color:#c9a96e55;font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px">Proyecto Final · Estudio de IA</div>
+    <h1>Sagash Intelligence</h1>
+  </div>
+  <span class="version">Demo v1.0</span>
+  <div class="header-right">
+    <div style="color:#ffffff33;font-size:0.8rem">Agente Orquestado · Claude AI</div>
+  </div>
+</header>
+
+<!-- API KEY BAR -->
+<div id="setup-bar">
+  <label>🔑 API Key de Claude:</label>
+  <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." autocomplete="off">
+  <button class="btn-conectar" onclick="conectarAPI()">Conectar</button>
+  <span id="status-api">Ingresa tu API key para comenzar</span>
+</div>
+
+<main>
+
+  <!-- ── MÓDULO 1: RADAR ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-blue">📡</div>
+      <div>
+        <div class="card-title">Radar E-commerce</div>
+        <div class="card-mod">Módulo 1 · Noticias + IA</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">
+        Analiza las tendencias actuales del e-commerce y la IA. Claude identifica oportunidades y amenazas relevantes para Sagash.
+      </div>
+      <button class="btn-run btn-blue" id="btn-radar" onclick="ejecutarRadar()" disabled>
+        ▶ Analizar Tendencias
+      </button>
+      <div class="output-box" id="out-radar"></div>
+    </div>
+  </div>
+
+  <!-- ── MÓDULO 2: DASHBOARD ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-green">📊</div>
+      <div>
+        <div class="card-title">Dashboard Sagash</div>
+        <div class="card-mod">Módulo 2 · Stats en tiempo real</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">
+        Lee los datos reales de pedidos, productos y analytics de Sagash. Claude interpreta y genera un reporte ejecutivo.
+      </div>
+      <button class="btn-run btn-green" id="btn-dash" onclick="ejecutarDashboard()" disabled>
+        ▶ Ver Stats de Sagash
+      </button>
+      <div class="output-box" id="out-dash"></div>
+    </div>
+  </div>
+
+  <!-- ── MÓDULO 3: SCORE ── -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-gold">🏆</div>
+      <div>
+        <div class="card-title">Score de Éxito</div>
+        <div class="card-mod">Módulo 3 · % de crecimiento</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-desc">
+        Cruza tendencias del mercado con los datos reales de Sagash. Claude calcula qué tan cerca está de escalar a empresa grande.
+      </div>
+      <button class="btn-run btn-gold" id="btn-score" onclick="ejecutarScore()" disabled>
+        ▶ Calcular Score
+      </button>
+      <div id="score-display">
+        <div class="score-number" id="score-num">0%</div>
+        <div class="score-label">Score de Éxito Sagash</div>
+        <div class="score-bar-wrap"><div class="score-bar" id="score-bar"></div></div>
+      </div>
+      <div class="output-box" id="out-score"></div>
+    </div>
+  </div>
+
+  <!-- ── BOTÓN EJECUTAR TODO ── -->
+  <div class="card-full" style="text-align:center;padding:20px 28px;">
+    <button class="btn-run" id="btn-todo" onclick="ejecutarTodo()" disabled
+      style="max-width:400px;margin:0 auto;padding:14px;font-size:1rem;background:linear-gradient(135deg,#c9a96e22,#c9a96e33);color:#c9a96e;border:1px solid #c9a96e55;letter-spacing:1px;">
+      ⚡ Ejecutar Agente Completo
+    </button>
+  </div>
+
+  <!-- ── CHAT ── -->
+  <div class="card-full">
+    <h3>💬 Pregúntale al Agente</h3>
+    <div style="display:flex;gap:10px;margin-bottom:12px;">
+      <input id="chat-input" type="text" placeholder="¿Cuál es mi producto más visto? ¿Qué debería hacer hoy?..."
+        style="flex:1;background:#0f0f1a;border:1px solid #ffffff22;border-radius:8px;padding:10px 14px;color:#fff;font-size:0.85rem;font-family:inherit;outline:none;"
+        onkeydown="if(event.key==='Enter')enviarChat()">
+      <button onclick="enviarChat()" id="btn-chat"
+        style="background:#c9a96e22;border:1px solid #c9a96e55;color:#c9a96e;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:0.85rem;">
+        Enviar
+      </button>
+    </div>
+    <div id="chat-output" style="display:flex;flex-direction:column;gap:10px;max-height:300px;overflow-y:auto;"></div>
+  </div>
+
+  <!-- ── LOG GLOBAL ── -->
+  <div class="card-full">
+    <h3>📋 Log del Agente</h3>
+    <div class="log-list" id="log-list">
+      <div class="log-item">
+        <span class="log-time">--:--:--</span>
+        <span class="log-mod log-gold">SISTEMA</span>
+        <span>Esperando conexión con Claude API...</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Sagash Intelligence · Proyecto Final Estudio de IA · Claude API (Anthropic) · Google Sheets
+</footer>
+
+<script>
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz5e9vRM0c2CWKRL8Bb66A2BjoT0w5C85a5J6l15UTR8tGz0dFzTYSRa89AXQ7ZrFB7/exec';
+  let apiKey = '';
+  let sagashData = null;
+
+  // ── CONEXIÓN API ──
+  function conectarAPI() {
+    const val = document.getElementById('api-key-input').value.trim();
+    if (!val.startsWith('sk-ant-')) {
+      setStatus('Clave inválida. Debe empezar con sk-ant-', 'err');
+      return;
+    }
+    apiKey = val;
+    setStatus('✓ Conectado — Claude listo', 'ok');
+    document.getElementById('btn-radar').disabled = false;
+    document.getElementById('btn-dash').disabled = false;
+    document.getElementById('btn-score').disabled = false;
+    document.getElementById('btn-todo').disabled = false;
+    addLog('SISTEMA', 'gold', 'API Key conectada. Agente Sagash Intelligence activo.');
+    cargarDatosSagash();
+  }
+
+  function setStatus(msg, cls) {
+    const el = document.getElementById('status-api');
+    el.textContent = msg;
+    el.className = cls || '';
+  }
+
+  // ── CARGAR DATOS DE SAGASH ──
+  function cargarDatosSagash() {
+    addLog('DATOS', 'green', 'Cargando datos de Google Sheets...');
+    sagashData = {};
+
+    // Cargar pedidos + analytics
+    const cb1 = 'cb1_' + Date.now();
+    const s1 = document.createElement('script');
+    s1.src = `${APPS_SCRIPT_URL}?clave=sagash2025&callback=${cb1}`;
+    window[cb1] = function(data) {
+      sagashData.pedidos = data.pedidos || [];
+      sagashData.analytics = data.analytics || [];
+      delete window[cb1];
+      document.body.removeChild(s1);
+      verificarCarga();
+    };
+    s1.onerror = function() { delete window[cb1]; verificarCarga(); };
+    document.body.appendChild(s1);
+
+    // Cargar productos
+    const cb2 = 'cb2_' + Date.now();
+    const s2 = document.createElement('script');
+    s2.src = `${APPS_SCRIPT_URL}?action=productos&callback=${cb2}`;
+    window[cb2] = function(data) {
+      sagashData.productos = Array.isArray(data) ? data : [];
+      delete window[cb2];
+      document.body.removeChild(s2);
+      verificarCarga();
+    };
+    s2.onerror = function() { delete window[cb2]; verificarCarga(); };
+    document.body.appendChild(s2);
+
+    let verificado = false;
+    function verificarCarga() {
+      if (verificado) return;
+      if (sagashData.pedidos !== undefined && sagashData.productos !== undefined) {
+        verificado = true;
+        addLog('DATOS', 'green', `Sheets cargado: ${sagashData.productos.length} productos, ${sagashData.pedidos.length} pedidos, ${sagashData.analytics?.length || 0} eventos analytics.`);
+      }
+    }
+
+    setTimeout(() => {
+      if (!verificado) {
+        verificado = true;
+        if (!sagashData.productos) sagashData = getDemoData();
+        addLog('DATOS', 'green', 'Usando datos de ejemplo para demo.');
+      }
+    }, 6000);
+  }
+
+  function getDemoData() {
+    return {
+      productos: [
+        { nombre: 'Masajeador de Piernas', precio: '$159.900', activo: 'si' },
+        { nombre: 'Tobillera Magnética', precio: '$89.900', activo: 'si' },
+        { nombre: 'Guantes Venum', precio: '$99.900', activo: 'si' },
+        { nombre: 'Barco Humidificador', precio: '$119.900', activo: 'si' },
+        { nombre: 'Licuadora Portátil', precio: '$229.900', activo: 'si' },
+      ],
+      pedidos: [
+        { producto: 'Licuadora Portátil', fecha: '2025-01-15' },
+        { producto: 'Guantes Venum', fecha: '2025-01-14' },
+        { producto: 'Masajeador de Piernas', fecha: '2025-01-13' },
+      ],
+      analytics: [
+        { evento: 'vista', producto: 'Licuadora Portátil', hora: '20:00' },
+        { evento: 'vista', producto: 'Masajeador de Piernas', hora: '21:00' },
+        { evento: 'vista', producto: 'Tobillera Magnética', hora: '19:00' },
+      ]
+    };
+  }
+
+  // ── LLAMAR A CLAUDE API ──
+  async function llamarClaude(prompt) {
+    const res = await fetch('http://localhost:3002/claude', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 600,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    if (!res.ok) throw new Error(`Error API: ${res.status}`);
+    const data = await res.json();
+    return data.content[0].text;
+  }
+
+  // ── MÓDULO 1: RADAR ──
+  async function ejecutarRadar() {
+    const out = document.getElementById('out-radar');
+    const btn = document.getElementById('btn-radar');
+    out.className = 'output-box visible';
+    out.innerHTML = '<div class="loading"><span class="spinner"></span> Claude analizando tendencias...</div>';
+    btn.disabled = true;
+    addLog('M1', 'blue', 'Ejecutando Radar E-commerce...');
+
+    try {
+      const resp = await llamarClaude(`Eres un analista de e-commerce. Analiza las tendencias más importantes del e-commerce y la IA en 2025 para un emprendedor colombiano de dropshipping que vende productos de bienestar y tecnología.
+
+      Responde en español con:
+      1. Top 3 tendencias del mercado (muy breve)
+      2. Una oportunidad concreta para aprovechar ahora
+      3. Una amenaza a vigilar
+
+      Máximo 200 palabras. Sé directo y práctico.`);
+      out.textContent = resp;
+      addLog('M1', 'blue', 'Radar completado. Tendencias analizadas.');
+    } catch(e) {
+      out.textContent = 'Error: ' + e.message;
+      addLog('M1', 'blue', 'Error en Radar: ' + e.message);
+    }
+    btn.disabled = false;
+  }
+
+  // ── MÓDULO 2: DASHBOARD ──
+  async function ejecutarDashboard() {
+    const out = document.getElementById('out-dash');
+    const btn = document.getElementById('btn-dash');
+    out.className = 'output-box visible';
+    out.innerHTML = '<div class="loading"><span class="spinner"></span> Leyendo Sagash + analizando...</div>';
+    btn.disabled = true;
+    addLog('M2', 'green', 'Ejecutando Dashboard Sagash...');
+
+    const data = sagashData || getDemoData();
+    const prods = data.productos?.map(p => p.nombre).join(', ') || 'Sin datos';
+    const nPedidos = data.pedidos?.length || 0;
+    const nProductos = data.productos?.length || 0;
+    const eventos = data.analytics?.length || 0;
+
+    try {
+      const resp = await llamarClaude(`Eres el asistente de inteligencia de negocio de HeyySagash, una tienda colombiana de dropshipping.
+
+      Datos actuales:
+      - Productos activos: ${nProductos} (${prods})
+      - Pedidos registrados: ${nPedidos}
+      - Eventos de analytics: ${eventos}
+      - Último pedido: ${data.pedidos?.[0]?.producto || 'N/A'}
+
+      Genera un reporte ejecutivo breve en español con:
+      1. Estado actual del negocio (1 línea)
+      2. Producto estrella
+      3. Recomendación inmediata
+      4. Alerta si la hay
+
+      Máximo 150 palabras. Tono profesional pero cercano.`);
+      out.textContent = resp;
+      addLog('M2', 'green', `Dashboard listo. ${nProductos} productos, ${nPedidos} pedidos analizados.`);
+    } catch(e) {
+      out.textContent = 'Error: ' + e.message;
+      addLog('M2', 'green', 'Error en Dashboard: ' + e.message);
+    }
+    btn.disabled = false;
+  }
+
+  // ── MÓDULO 3: SCORE ──
+  async function ejecutarScore() {
+    const scoreDisp = document.getElementById('score-display');
+    const out = document.getElementById('out-score');
+    const btn = document.getElementById('btn-score');
+    out.className = 'output-box visible';
+    out.innerHTML = '<div class="loading"><span class="spinner"></span> Claude calculando Score de Éxito...</div>';
+    scoreDisp.className = '';
+    btn.disabled = true;
+    addLog('M3', 'gold', 'Calculando Score de Éxito Sagash...');
+
+    const data = sagashData || getDemoData();
+    const nPedidos = data.pedidos?.length || 0;
+    const nProductos = data.productos?.length || 0;
+
+    try {
+      const resp = await llamarClaude(`Eres un sistema de scoring para negocios de e-commerce. Evalúa HeyySagash, una tienda colombiana de dropshipping que usa Dropi.
+
+      Datos del negocio:
+      - Productos en catálogo: ${nProductos}
+      - Pedidos totales: ${nPedidos}
+      - Plataforma: Dropi (dropshipping)
+      - Canal: Página web propia + TikTok orgánico
+      - Tiempo operando: ~3 meses
+
+      Responde EXACTAMENTE en este formato JSON (solo el JSON, nada más):
+      {
+        "score": <número del 1 al 100>,
+        "nivel": "<Semilla | Creciendo | Establecido | Escalando | Empresa>",
+        "resumen": "<2 oraciones sobre el estado>",
+        "siguiente_hito": "<qué hacer para subir el score>"
+      }`);
+
+      let parsed;
+      try {
+        parsed = JSON.parse(resp.trim());
+      } catch {
+        const match = resp.match(/\{[\s\S]*\}/);
+        parsed = match ? JSON.parse(match[0]) : { score: 4, nivel: 'Semilla', resumen: resp, siguiente_hito: '' };
+      }
+
+      const score = Math.min(100, Math.max(1, parsed.score));
+      document.getElementById('score-num').textContent = score + '%';
+      document.getElementById('score-bar').style.width = score + '%';
+      scoreDisp.className = 'visible';
+
+      out.textContent = `Nivel: ${parsed.nivel}\n\n${parsed.resumen}\n\nPróximo hito: ${parsed.siguiente_hito}`;
+      addLog('M3', 'gold', `Score calculado: ${score}% — Nivel: ${parsed.nivel}`);
+    } catch(e) {
+      out.textContent = 'Error: ' + e.message;
+      addLog('M3', 'gold', 'Error en Score: ' + e.message);
+    }
+    btn.disabled = false;
+  }
+
+  // ── EJECUTAR TODO ──
+  async function ejecutarTodo() {
+    const btn = document.getElementById('btn-todo');
+    btn.disabled = true;
+    btn.textContent = '⏳ Ejecutando agente...';
+    addLog('SISTEMA', 'gold', 'Iniciando ejecución completa del agente...');
+    await ejecutarRadar();
+    await new Promise(r => setTimeout(r, 1000));
+    await ejecutarDashboard();
+    await new Promise(r => setTimeout(r, 1000));
+    await ejecutarScore();
+    btn.disabled = false;
+    btn.textContent = '⚡ Ejecutar Agente Completo';
+    addLog('SISTEMA', 'gold', 'Ejecución completa finalizada.');
+  }
+
+  // ── CHAT ──
+  async function enviarChat() {
+    const input = document.getElementById('chat-input');
+    const output = document.getElementById('chat-output');
+    const pregunta = input.value.trim();
+    if (!pregunta || !apiKey) return;
+    input.value = '';
+
+    // Mensaje del usuario
+    const userMsg = document.createElement('div');
+    userMsg.style.cssText = 'background:#ffffff08;border-radius:8px;padding:10px 14px;font-size:0.82rem;color:#ffffffcc;align-self:flex-end;max-width:80%;';
+    userMsg.textContent = pregunta;
+    output.appendChild(userMsg);
+
+    // Mensaje de Claude
+    const aiMsg = document.createElement('div');
+    aiMsg.style.cssText = 'background:#c9a96e11;border:1px solid #c9a96e22;border-radius:8px;padding:10px 14px;font-size:0.82rem;color:#ffffffbb;max-width:90%;white-space:pre-wrap;';
+    aiMsg.innerHTML = '<span class="spinner"></span> Pensando...';
+    output.appendChild(aiMsg);
+    output.scrollTop = output.scrollHeight;
+
+    const data = sagashData || getDemoData();
+    const prods = data.productos?.map(p => p.nombre).join(', ') || 'N/A';
+    const nPedidos = data.pedidos?.length || 0;
+    const ultimoPedido = data.pedidos?.[0]?.[5] || data.pedidos?.[0]?.producto || 'N/A';
+
+    try {
+      const resp = await llamarClaude(`Eres el asistente inteligente de HeyySagash, tienda colombiana de dropshipping.
+
+Datos actuales del negocio:
+- Productos: ${prods}
+- Pedidos totales: ${nPedidos}
+- Último pedido: ${ultimoPedido}
+- Plataforma: Dropi · Canal: web propia + TikTok
+
+El dueño te pregunta: "${pregunta}"
+
+Responde en español, máximo 3 oraciones, directo y útil.`);
+      aiMsg.textContent = resp;
+    } catch(e) {
+      aiMsg.textContent = 'Error: ' + e.message;
+    }
+    output.scrollTop = output.scrollHeight;
+    addLog('CHAT', 'gold', `Pregunta respondida: "${pregunta.slice(0, 40)}..."`);
+  }
+
+  // ── LOG ──
+  function addLog(mod, color, msg) {
+    const list = document.getElementById('log-list');
+    const now = new Date();
+    const time = now.toTimeString().slice(0, 8);
+    const item = document.createElement('div');
+    item.className = 'log-item';
+    item.innerHTML = `<span class="log-time">${time}</span><span class="log-mod log-${color}">${mod}</span><span>${msg}</span>`;
+    list.appendChild(item);
+    list.scrollTop = list.scrollHeight;
+  }
+
+  // Enter en API key
+  document.getElementById('api-key-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') conectarAPI();
+  });
+</script>
+
+</body>
+</html>
