@@ -482,6 +482,7 @@
             .productos-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
+    <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -499,7 +500,10 @@
     <!-- HEADER -->
     <header class="header">
         <a href="index.html" class="header-logo">Heyy<span>Sagash</span></a>
-        <a href="index.html" class="header-volver">← Volver</a>
+        <div style="display:flex;align-items:center;gap:1rem;">
+            <a href="coach.html" style="font-size:0.8rem;color:#C9A84C;text-decoration:none;font-weight:700;border:1px solid #C9A84C44;padding:0.35rem 0.8rem;border-radius:20px;">✦ Coach</a>
+            <a href="index.html" class="header-volver">← Volver a la tienda principal</a>
+        </div>
     </header>
 
     <!-- ====== HERO ====== -->
@@ -752,7 +756,8 @@
                 <div style="font-size:3.5rem;margin-bottom:16px;">✓</div>
                 <h3 style="color:#c9a84c;font-size:1.2rem;margin-bottom:10px;">¡Pedido recibido!</h3>
                 <p style="color:#ffffff88;font-size:0.88rem;line-height:1.7;">En menos de 24 horas te contactamos<br>para confirmar tu envío.<br><span style="color:#c9a84c55;font-size:0.8rem;">Revisa tu correo — ahí tienes los detalles.</span></p>
-                <button onclick="cerrarModal()" style="margin-top:22px;background:transparent;border:1px solid #c9a84c44;color:#c9a84c88;padding:9px 22px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.85rem;">Cerrar</button>
+                <a href="coach.html" style="display:block;margin-top:18px;background:#C9A84C;color:#0a0702;padding:11px 22px;border-radius:10px;font-weight:800;font-size:0.92rem;text-decoration:none;">✦ Hablar con mi Coach de Postura →</a>
+                <button onclick="cerrarModal()" style="margin-top:10px;background:transparent;border:1px solid #c9a84c22;color:#c9a84c55;padding:8px 22px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:0.82rem;">Cerrar</button>
             </div>
         </div>
     </div>

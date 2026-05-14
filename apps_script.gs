@@ -42,29 +42,111 @@ function doPost(e) {
     ]);
     MailApp.sendEmail({
       to: datos.correo,
-      subject: '✓ Tu pedido en HeyySagash fue recibido',
-      htmlBody: `
-        <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;background:#0a0702;color:#fff;padding:32px;border-radius:12px;">
-          <h2 style="color:#C9A84C;margin-bottom:8px">¡Pedido recibido! ✓</h2>
-          <p style="color:#ffffff99;margin-bottom:20px">Hola <strong style="color:#fff">${datos.nombre}</strong>, ya tenemos tu solicitud.</p>
-          <div style="background:#150d00;border:1px solid #c9a84c22;border-radius:8px;padding:16px;margin-bottom:16px;">
-            <p style="color:#C9A84C;font-size:0.8rem;letter-spacing:2px;margin-bottom:6px">PRODUCTO SOLICITADO</p>
-            <p style="font-weight:700;font-size:1rem;margin:0">${datos.producto}</p>
-          </div>
-          <div style="background:#150d00;border:1px solid #c9a84c22;border-radius:8px;padding:16px;margin-bottom:20px;">
-            <p style="color:#C9A84C;font-size:0.8rem;letter-spacing:2px;margin-bottom:8px">DATOS DE ENTREGA</p>
-            <p style="color:#ccc;font-size:0.88rem;margin:4px 0">📍 ${datos.ciudad} — ${datos.direccion}</p>
-            <p style="color:#ccc;font-size:0.88rem;margin:4px 0">📞 ${datos.celular}</p>
-          </div>
-          <p style="color:#ffffff66;font-size:0.85rem;line-height:1.7;margin-bottom:0;">
-            En menos de 24 horas te contactamos para confirmar tu envío.<br>
-            <strong style="color:#C9A84C">Pago contra entrega — pagas solo cuando recibes.</strong>
+      subject: 'Pedido recibido — HeyySagash #' + new Date().getTime().toString().slice(-6),
+      htmlBody: `<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f4f1eb;font-family:Georgia,'Times New Roman',serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f1eb;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="100%" style="max-width:520px;">
+
+        <!-- HEADER -->
+        <tr><td style="background:#0a0702;padding:32px 36px;border-radius:12px 12px 0 0;text-align:center;">
+          <p style="margin:0 0 6px;font-size:11px;letter-spacing:4px;color:#C9A84C;font-family:Arial,sans-serif;text-transform:uppercase;">Confirmación de pedido</p>
+          <h1 style="margin:0;font-size:26px;color:#ffffff;font-family:Georgia,serif;font-weight:normal;letter-spacing:1px;">HeyySagash</h1>
+          <p style="margin:10px 0 0;font-size:12px;color:#ffffff55;font-family:Arial,sans-serif;letter-spacing:1px;">Tu bienestar, nuestra pasión</p>
+        </td></tr>
+
+        <!-- SALUDO -->
+        <tr><td style="background:#ffffff;padding:32px 36px 0;">
+          <p style="margin:0;font-size:15px;color:#1a1200;line-height:1.7;">Hola <strong>${datos.nombre}</strong>,</p>
+          <p style="margin:10px 0 0;font-size:14px;color:#555;line-height:1.8;font-family:Arial,sans-serif;">
+            Hemos recibido tu pedido correctamente. En menos de <strong style="color:#1a1200;">24 horas</strong> te contactaremos para coordinar la entrega.
           </p>
-          <p style="color:#ffffff22;font-size:0.72rem;margin-top:24px;padding-top:16px;border-top:1px solid #ffffff11;">
-            HeyySagash · Tu bienestar, nuestra pasión
+        </td></tr>
+
+        <!-- PRODUCTO -->
+        <tr><td style="background:#ffffff;padding:24px 36px 0;">
+          <p style="margin:0 0 10px;font-size:10px;letter-spacing:3px;color:#C9A84C;font-family:Arial,sans-serif;text-transform:uppercase;">Producto solicitado</p>
+          <table width="100%" style="border:1px solid #e8e0d0;border-radius:8px;overflow:hidden;">
+            <tr>
+              <td style="padding:16px 20px;background:#faf8f4;">
+                <p style="margin:0;font-size:15px;font-weight:bold;color:#0a0702;">${datos.producto}</p>
+                <p style="margin:6px 0 0;font-size:12px;color:#888;font-family:Arial,sans-serif;">Pago contra entrega</p>
+              </td>
+              <td style="padding:16px 20px;background:#faf8f4;text-align:right;vertical-align:top;">
+                <span style="display:inline-block;background:#0a0702;color:#C9A84C;font-size:11px;font-family:Arial,sans-serif;letter-spacing:1px;padding:4px 10px;border-radius:20px;">CONFIRMADO</span>
+              </td>
+            </tr>
+          </table>
+        </td></tr>
+
+        <!-- ENTREGA -->
+        <tr><td style="background:#ffffff;padding:20px 36px 0;">
+          <p style="margin:0 0 10px;font-size:10px;letter-spacing:3px;color:#C9A84C;font-family:Arial,sans-serif;text-transform:uppercase;">Datos de entrega</p>
+          <table width="100%" style="border:1px solid #e8e0d0;border-radius:8px;">
+            <tr><td style="padding:16px 20px;background:#faf8f4;">
+              <table>
+                <tr>
+                  <td style="padding:4px 12px 4px 0;font-size:12px;color:#999;font-family:Arial,sans-serif;vertical-align:top;">Ciudad</td>
+                  <td style="padding:4px 0;font-size:13px;color:#1a1200;font-family:Arial,sans-serif;">${datos.ciudad}</td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 12px 4px 0;font-size:12px;color:#999;font-family:Arial,sans-serif;vertical-align:top;">Dirección</td>
+                  <td style="padding:4px 0;font-size:13px;color:#1a1200;font-family:Arial,sans-serif;">${datos.direccion}</td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 12px 4px 0;font-size:12px;color:#999;font-family:Arial,sans-serif;vertical-align:top;">Celular</td>
+                  <td style="padding:4px 0;font-size:13px;color:#1a1200;font-family:Arial,sans-serif;">${datos.celular}</td>
+                </tr>
+              </table>
+            </td></tr>
+          </table>
+        </td></tr>
+
+        <!-- NOTA -->
+        <tr><td style="background:#ffffff;padding:24px 36px 32px;">
+          <table width="100%" style="border-left:3px solid #C9A84C;background:#fdf9f0;border-radius:0 8px 8px 0;">
+            <tr><td style="padding:14px 18px;">
+              <p style="margin:0;font-size:13px;color:#555;line-height:1.8;font-family:Arial,sans-serif;">
+                Pagas <strong style="color:#0a0702;">solo cuando recibes</strong> el producto en tu puerta. No hay ningún cobro anticipado.
+              </p>
+            </td></tr>
+          </table>
+        </td></tr>
+
+        <!-- FOOTER -->
+        <tr><td style="background:#0a0702;padding:24px 36px;border-radius:0 0 12px 12px;text-align:center;">
+          <p style="margin:0;font-size:11px;color:#ffffff44;font-family:Arial,sans-serif;letter-spacing:1px;">
+            HeyySagash &nbsp;·&nbsp; Colombia &nbsp;·&nbsp; heyysa<wbr>gash.vercel.app
           </p>
-        </div>
-      `
+          <p style="margin:8px 0 0;font-size:10px;color:#ffffff22;font-family:Arial,sans-serif;">
+            Este correo es una confirmación automática. No es necesario responder.
+          </p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+    });
+    MailApp.sendEmail({
+      to: 'crisnielcar50@gmail.com',
+      subject: '🛒 Nuevo pedido de corrector — ' + datos.nombre,
+      htmlBody: `<div style="font-family:Arial,sans-serif;max-width:480px;background:#0a0702;color:#fff;padding:28px;border-radius:10px;">
+        <p style="color:#C9A84C;font-size:11px;letter-spacing:3px;margin:0 0 8px">NUEVO PEDIDO · CORRECTORES</p>
+        <h2 style="color:#fff;margin:0 0 20px;font-size:1.2rem">${datos.nombre}</h2>
+        <table style="width:100%;font-size:13px;border-collapse:collapse;">
+          <tr><td style="color:#888;padding:6px 0;border-bottom:1px solid #1a1000">Producto</td><td style="color:#C9A84C;font-weight:700;padding:6px 0;border-bottom:1px solid #1a1000">${datos.producto}</td></tr>
+          <tr><td style="color:#888;padding:6px 0;border-bottom:1px solid #1a1000">Ciudad</td><td style="color:#fff;padding:6px 0;border-bottom:1px solid #1a1000">${datos.ciudad}</td></tr>
+          <tr><td style="color:#888;padding:6px 0;border-bottom:1px solid #1a1000">Dirección</td><td style="color:#fff;padding:6px 0;border-bottom:1px solid #1a1000">${datos.direccion}</td></tr>
+          <tr><td style="color:#888;padding:6px 0;border-bottom:1px solid #1a1000">Celular</td><td style="color:#fff;padding:6px 0;border-bottom:1px solid #1a1000">${datos.celular}</td></tr>
+          <tr><td style="color:#888;padding:6px 0">Correo cliente</td><td style="color:#60a5fa;padding:6px 0">${datos.correo}</td></tr>
+        </table>
+        <p style="color:#ffffff33;font-size:11px;margin-top:20px;border-top:1px solid #1a1000;padding-top:12px;">HeyySagash · Notificación automática en tiempo real</p>
+      </div>`
     });
     return json(ok);
   }
@@ -149,6 +231,53 @@ function doGet(e) {
     const sheetCor = ss.getSheetByName('Correctores');
     if (!sheetCor || sheetCor.getLastRow() === 0) return responder({ correctores: [] });
     return responder({ correctores: sheetCor.getDataRange().getValues() });
+  }
+
+  // --- Registro de usuario (coach) ---
+  if (e.parameter.action === 'registro_usuario') {
+    let sheet = ss.getSheetByName('Usuarios');
+    if (!sheet) {
+      sheet = ss.insertSheet('Usuarios');
+      sheet.appendRow(['fecha', 'nombre', 'email', 'password', 'corrector', 'horas', 'semanas', 'dolores']);
+    }
+    const email = (e.parameter.email || '').toLowerCase().trim();
+    const nombre = e.parameter.nombre || '';
+    const pass = e.parameter.password || '';
+    const filas = sheet.getDataRange().getValues().slice(1);
+    const existe = filas.some(f => String(f[2]).toLowerCase().trim() === email);
+    if (existe) return responder({ error: 'Ese correo ya está registrado' });
+    sheet.appendRow([new Date().toLocaleString('es-CO'), nombre, email, pass, '', '', '', '']);
+    return responder({ usuario: { nombre, email, corrector: '', horas: '', semanas: '', dolores: '' } });
+  }
+
+  // --- Login de usuario (coach) ---
+  if (e.parameter.action === 'login_usuario') {
+    const sheet = ss.getSheetByName('Usuarios');
+    if (!sheet) return responder({ error: 'Usuario no encontrado' });
+    const email = (e.parameter.email || '').toLowerCase().trim();
+    const pass = e.parameter.password || '';
+    const filas = sheet.getDataRange().getValues().slice(1);
+    const fila = filas.find(f => String(f[2]).toLowerCase().trim() === email && String(f[3]) === pass);
+    if (!fila) return responder({ error: 'Correo o contraseña incorrectos' });
+    return responder({ usuario: { nombre: fila[1], email: fila[2], corrector: fila[4], horas: fila[5], semanas: fila[6], dolores: fila[7] } });
+  }
+
+  // --- Guardar perfil de onboarding (coach) ---
+  if (e.parameter.action === 'guardar_perfil') {
+    const sheet = ss.getSheetByName('Usuarios');
+    if (!sheet) return responder({ error: 'sin hoja' });
+    const email = (e.parameter.email || '').toLowerCase().trim();
+    const filas = sheet.getDataRange().getValues();
+    for (let i = 1; i < filas.length; i++) {
+      if (String(filas[i][2]).toLowerCase().trim() === email) {
+        sheet.getRange(i + 1, 5, 1, 4).setValues([[
+          e.parameter.corrector || '', e.parameter.horas || '',
+          e.parameter.semanas || '0', e.parameter.dolores || ''
+        ]]);
+        break;
+      }
+    }
+    return responder({ ok: true });
   }
 
   // --- Dashboard admin (pedidos + analytics) ---

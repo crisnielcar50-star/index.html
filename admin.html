@@ -458,7 +458,104 @@
             accent-color: var(--dorado);
             cursor: pointer;
         }
+
+        /* ===== CORRECTORES ANALYTICS ===== */
+        .cor-kpi-fila {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        @media (max-width: 900px) { .cor-kpi-fila { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 600px) { .cor-kpi-fila { grid-template-columns: repeat(2, 1fr); } }
+
+        .cor-kpi {
+            background: var(--negro-medio);
+            border: 1px solid var(--gris-oscuro);
+            border-radius: 10px;
+            padding: 1rem;
+            border-top: 3px solid var(--dorado);
+        }
+        .cor-kpi.k-naranja { border-top-color: #f97316; }
+        .cor-kpi.k-amarillo { border-top-color: #eab308; }
+        .cor-kpi.k-azul { border-top-color: #3b82f6; }
+        .cor-kpi.k-verde { border-top-color: #22c55e; }
+
+        .cor-kpi-num {
+            font-size: 1.7rem;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: 0.3rem;
+        }
+        .cor-kpi.k-naranja .cor-kpi-num { color: #f97316; }
+        .cor-kpi.k-amarillo .cor-kpi-num { color: #eab308; }
+        .cor-kpi.k-azul .cor-kpi-num { color: #3b82f6; }
+        .cor-kpi.k-verde .cor-kpi-num { color: #22c55e; }
+
+        .cor-kpi-label {
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            color: var(--gris);
+            text-transform: uppercase;
+        }
+
+        .cor-charts-fila {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        @media (max-width: 700px) { .cor-charts-fila { grid-template-columns: 1fr; } }
+
+        .cor-chart-box {
+            background: var(--negro-medio);
+            border: 1px solid var(--gris-oscuro);
+            border-radius: 10px;
+            padding: 1.2rem;
+        }
+        .cor-chart-titulo {
+            font-size: 0.65rem;
+            letter-spacing: 2.5px;
+            color: var(--dorado);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .cor-barra-fila {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.7rem;
+            font-size: 0.8rem;
+        }
+        .cor-barra-nombre { width: 100px; color: var(--gris); flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cor-barra-track { flex: 1; background: #1a1000; border-radius: 4px; height: 8px; overflow: hidden; }
+        .cor-barra-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+        .cor-barra-val { width: 28px; text-align: right; color: #fff; font-weight: 700; flex-shrink: 0; }
+
+        .cor-ciudad-fila {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.45rem 0;
+            border-bottom: 1px solid #1a1000;
+            font-size: 0.82rem;
+        }
+        .cor-ciudad-fila:last-child { border-bottom: none; }
+        .cor-ciudad-nombre { color: #ccc; }
+        .cor-ciudad-badge {
+            background: #1a1000;
+            color: var(--dorado);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--dorado-oscuro);
+        }
     </style>
+    <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -479,6 +576,8 @@
                 <h1>Panel Administrativo</h1>
             </div>
             <div style="display:flex;gap:0.6rem">
+                <button class="btn-salir" onclick="window.open('dashboard.html')">📊 Dashboard</button>
+                <button class="btn-salir" onclick="window.open('demo.html')">🎓 Demo</button>
                 <button class="btn-salir" id="btn-pdf" onclick="generarPDF()">PDF</button>
                 <button class="btn-salir" onclick="cerrarSesion()">Salir</button>
             </div>
@@ -529,9 +628,75 @@
                     </div>
                 </div>
 
+                <!-- Correctores de Postura -->
+                <div>
+                    <p class="seccion-titulo" id="titulo-correctores" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+                        Correctores de Postura
+                        <span id="arrow-correctores" style="font-size:0.8rem;color:var(--gris-oscuro);transition:transform 0.3s ease;display:inline-block;transform:rotate(-90deg)">▾</span>
+                    </p>
+                    <div id="correctores-contenido" style="display:none">
+
+                        <!-- KPIs -->
+                        <div class="cor-kpi-fila">
+                            <div class="cor-kpi">
+                                <div class="cor-kpi-num" id="cor-total">0</div>
+                                <div class="cor-kpi-label">Pedidos totales</div>
+                            </div>
+                            <div class="cor-kpi k-naranja">
+                                <div class="cor-kpi-num" id="cor-m1">0</div>
+                                <div class="cor-kpi-label">Restaurador Total</div>
+                            </div>
+                            <div class="cor-kpi k-amarillo">
+                                <div class="cor-kpi-num" id="cor-m2">0</div>
+                                <div class="cor-kpi-label">Discreto Diario</div>
+                            </div>
+                            <div class="cor-kpi k-azul">
+                                <div class="cor-kpi-num" id="cor-m3">0</div>
+                                <div class="cor-kpi-label">Estructurado X</div>
+                            </div>
+                            <div class="cor-kpi k-verde">
+                                <div class="cor-kpi-num" id="cor-ingresos">$0</div>
+                                <div class="cor-kpi-label">Ingresos est.</div>
+                            </div>
+                        </div>
+
+                        <!-- Charts -->
+                        <div class="cor-charts-fila">
+                            <div class="cor-chart-box">
+                                <p class="cor-chart-titulo">Distribución por modelo</p>
+                                <div id="cor-barras"></div>
+                            </div>
+                            <div class="cor-chart-box">
+                                <p class="cor-chart-titulo">Top ciudades</p>
+                                <div id="cor-ciudades"><p style="color:var(--gris);font-size:0.82rem">Sin datos aún</p></div>
+                            </div>
+                        </div>
+
+                        <!-- Tabla -->
+                        <div class="tabla-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Producto</th>
+                                        <th>Nombre</th>
+                                        <th>Celular</th>
+                                        <th>Ciudad</th>
+                                        <th>Dirección</th>
+                                        <th>Correo</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-correctores">
+                                    <tr><td colspan="7" class="sin-datos">Cargando...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Tabla pedidos -->
                 <div>
-                    <p class="seccion-titulo">Pedidos recientes</p>
+                    <p class="seccion-titulo">Pedidos recientes (tienda principal)</p>
                     <div class="tabla-wrapper">
                         <table>
                             <thead>
@@ -555,7 +720,7 @@
     </div>
 
     <script>
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw1Stwhwb1S3icxJH0jLGUVAgzP5HD3wruFkUKWDA5daQvzstFsJOnNJeZddQUhY10D/exec';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz5e9vRM0c2CWKRL8Bb66A2BjoT0w5C85a5J6l15UTR8tGz0dFzTYSRa89AXQ7ZrFB7/exec';
 
         const linksDropi = {
             'Corrector de Postura': 'https://app.dropi.co/dashboard/product-details/729188/corrector-postura-espalda-ralla-colores',
@@ -869,6 +1034,80 @@
             contenedor.appendChild(btnNuevo);
         }
 
+        function cargarCorrectores() {
+            const cbName = 'sagashCorr_' + Date.now();
+            window[cbName] = function(data) {
+                delete window[cbName];
+                renderCorrectores(data && data.correctores ? data.correctores : []);
+            };
+            const s = document.createElement('script');
+            s.src = `${APPS_SCRIPT_URL}?action=correctores&clave=${CLAVE_SHEETS}&callback=${cbName}`;
+            s.onerror = () => { delete window[cbName]; renderCorrectores([]); };
+            document.head.appendChild(s);
+        }
+
+        function renderCorrectores(rows) {
+            const total = rows.length;
+            const m1 = rows.filter(r => String(r[1]).includes('Integral')).length;
+            const m2 = rows.filter(r => String(r[1]).includes('Hombros')).length;
+            const m3 = rows.filter(r => String(r[1]).includes('X')).length;
+            const ingresos = m1 * 89900 + m2 * 59900 + m3 * 69900;
+            const fmt = n => '$' + n.toLocaleString('es-CO');
+
+            document.getElementById('cor-total').textContent = total;
+            document.getElementById('cor-m1').textContent = m1;
+            document.getElementById('cor-m2').textContent = m2;
+            document.getElementById('cor-m3').textContent = m3;
+            document.getElementById('cor-ingresos').textContent = fmt(ingresos);
+
+            // Barras por modelo
+            const modelos = [
+                { nombre: 'Restaurador', val: m1, color: '#f97316' },
+                { nombre: 'Discreto',    val: m2, color: '#eab308' },
+                { nombre: 'Estructurado X', val: m3, color: '#3b82f6' }
+            ];
+            const maxM = Math.max(...modelos.map(m => m.val), 1);
+            document.getElementById('cor-barras').innerHTML = modelos.map(m => `
+                <div class="cor-barra-fila">
+                    <span class="cor-barra-nombre">${m.nombre}</span>
+                    <div class="cor-barra-track"><div class="cor-barra-fill" style="width:${Math.round(m.val/maxM*100)}%;background:${m.color}"></div></div>
+                    <span class="cor-barra-val">${m.val}</span>
+                </div>
+            `).join('');
+
+            // Top ciudades
+            const ciudades = {};
+            rows.forEach(r => {
+                const c = String(r[4] || '').trim();
+                if (c) ciudades[c] = (ciudades[c] || 0) + 1;
+            });
+            const topCiudades = Object.entries(ciudades).sort((a,b) => b[1]-a[1]).slice(0, 5);
+            document.getElementById('cor-ciudades').innerHTML = topCiudades.length
+                ? topCiudades.map(([c,n]) => `<div class="cor-ciudad-fila"><span class="cor-ciudad-nombre">${c}</span><span class="cor-ciudad-badge">${n}</span></div>`).join('')
+                : '<p style="color:var(--gris);font-size:0.82rem">Sin datos aún</p>';
+
+            // Tabla
+            const tbody = document.getElementById('tabla-correctores');
+            if (total === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="sin-datos">Sin pedidos aún</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            [...rows].reverse().forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${r[0] || ''}</td>
+                    <td style="color:var(--dorado-claro);font-weight:700">${r[1] || ''}</td>
+                    <td>${r[2] || ''}</td>
+                    <td>${r[3] || ''}</td>
+                    <td>${r[4] || ''}</td>
+                    <td>${r[5] || ''}</td>
+                    <td style="color:#60a5fa">${r[6] || ''}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
         function activarToggleGestion() {
             var titulo = document.getElementById('titulo-gestion');
             if (titulo) {
@@ -878,6 +1117,16 @@
                     var oculto = editor.style.display === 'none';
                     editor.style.display = oculto ? '' : 'none';
                     arrow.style.transform = oculto ? '' : 'rotate(180deg)';
+                });
+            }
+            var tituloC = document.getElementById('titulo-correctores');
+            if (tituloC) {
+                tituloC.addEventListener('click', function() {
+                    var contenido = document.getElementById('correctores-contenido');
+                    var arrow = document.getElementById('arrow-correctores');
+                    var oculto = contenido.style.display === 'none';
+                    contenido.style.display = oculto ? '' : 'none';
+                    arrow.style.transform = oculto ? '' : 'rotate(-90deg)';
                 });
             }
             var tituloR = document.getElementById('titulo-rendimiento');
@@ -978,6 +1227,7 @@
             document.getElementById('cargando').classList.add('oculto');
             document.getElementById('contenido-admin').classList.remove('oculto');
             cargarProductosEditor();
+            cargarCorrectores();
             activarToggleGestion();
         }
         function generarPDF() {
