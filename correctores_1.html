@@ -481,6 +481,81 @@
         @media (min-width: 540px) and (max-width: 767px) {
             .productos-grid { grid-template-columns: repeat(2, 1fr); }
         }
+
+        /* ===== SCAN SECTION ===== */
+        .scan-section { padding: 5rem 1.5rem; text-align: center; background: linear-gradient(180deg, transparent 0%, #150d0066 50%, transparent 100%); position: relative; z-index: 1; }
+        .scan-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: #C9A84C18; border: 1px solid #C9A84C44; color: var(--dorado); font-size: 0.68rem; letter-spacing: 3px; font-weight: 800; padding: 0.4rem 1rem; border-radius: 20px; margin-bottom: 1.5rem; text-transform: uppercase; }
+        .scan-badge-dot { width: 6px; height: 6px; background: var(--dorado); border-radius: 50%; animation: badgeDot 1.4s ease-in-out infinite; }
+        @keyframes badgeDot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.65)} }
+        .scan-section h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 1rem; }
+        .scan-section h2 em { color: var(--dorado); font-style: italic; }
+        .scan-desc { color: #ffffff77; max-width: 520px; margin: 0 auto 2.5rem; font-weight: 300; line-height: 1.6; font-size: 1rem; }
+        .btn-scan-grande { display: inline-flex; align-items: center; gap: 0.75rem; background: var(--dorado); color: var(--negro); border: none; padding: 1.1rem 2.4rem; border-radius: 50px; font-family: 'Raleway', sans-serif; font-weight: 900; font-size: 1rem; letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s; animation: scanPulseBtn 2.5s ease-in-out infinite; }
+        .btn-scan-grande:hover { background: var(--dorado-claro); transform: translateY(-3px); box-shadow: 0 15px 40px -10px #c9a84c66; }
+        @keyframes scanPulseBtn { 0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.4)} 50%{box-shadow:0 0 0 12px rgba(201,168,76,0)} }
+        .scan-hint-text { font-size: 0.73rem; color: #3a3a3a; margin-top: 1rem; }
+
+        /* Recomendación */
+        .rec-card { display: none; max-width: 480px; margin: 2.5rem auto 0; background: linear-gradient(135deg, #1a1200, #0f0d02); border: 1px solid #C9A84C55; border-radius: 18px; padding: 1.8rem 1.6rem; text-align: left; animation: recAppear 0.55s cubic-bezier(0.16,1,0.3,1) both; }
+        @keyframes recAppear { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+        .rec-label { font-size: 0.62rem; letter-spacing: 3px; color: var(--dorado); font-weight: 800; text-transform: uppercase; margin-bottom: 0.5rem; }
+        .rec-nombre { font-family: 'Playfair Display', serif; font-size: 1.55rem; font-weight: 900; color: #fff; line-height: 1.2; margin-bottom: 0.25rem; }
+        .rec-subtitulo { font-size: 0.8rem; color: #666; margin-bottom: 1rem; }
+        .rec-razon { font-size: 0.88rem; color: #ffffffbb; line-height: 1.65; font-weight: 300; border-left: 3px solid var(--dorado); padding-left: 1rem; margin-bottom: 1.2rem; background: #C9A84C08; padding: 0.7rem 0.7rem 0.7rem 1rem; border-radius: 0 8px 8px 0; }
+        .rec-precio { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--dorado); font-weight: 900; margin-bottom: 1rem; }
+        .rec-cta { width: 100%; background: var(--dorado); color: var(--negro); border: none; padding: 1rem; border-radius: 10px; font-family: 'Raleway', sans-serif; font-weight: 900; font-size: 0.95rem; cursor: pointer; transition: all 0.3s; }
+        .rec-cta:hover { background: var(--dorado-claro); transform: translateY(-2px); }
+        .rec-rescan { display: block; text-align: center; margin-top: 0.75rem; font-size: 0.75rem; color: #444; cursor: pointer; background: none; border: none; font-family: inherit; width: 100%; transition: color 0.2s; }
+        .rec-rescan:hover { color: var(--dorado); }
+
+        /* ===== SCAN MODAL ===== */
+        #scan-modal { position: fixed; inset: 0; background: #000; z-index: 9000; display: none; flex-direction: column; }
+        .sm-header { padding: 0.85rem 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1a1000; flex-shrink: 0; }
+        .sm-titulo { font-size: 0.68rem; letter-spacing: 3px; color: var(--dorado); font-weight: 800; text-transform: uppercase; }
+        .sm-sub { font-size: 0.62rem; color: #444; margin-top: 0.12rem; }
+        .sm-cerrar { background: transparent; border: 1px solid #2a2000; color: #555; padding: 0.28rem 0.7rem; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 0.78rem; transition: all 0.2s; }
+        .sm-cerrar:hover { border-color: #555; color: #aaa; }
+        .sm-video-area { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #030201; min-height: 0; }
+        #sm-canvas { max-width: 100%; max-height: 100%; display: block; }
+        #sm-video { display: none; }
+        .sm-scan-line { position: absolute; left: 0; right: 0; height: 2px; pointer-events: none; background: linear-gradient(90deg, transparent 0%, #C9A84C99 40%, #C9A84Cff 50%, #C9A84C99 60%, transparent 100%); animation: smScanLine 2.2s ease-in-out infinite; display: none; }
+        @keyframes smScanLine { 0%{top:0;opacity:0} 5%{opacity:1} 90%{opacity:1} 100%{top:100%;opacity:0} }
+        .sm-corner { position: absolute; width: 18px; height: 18px; pointer-events: none; }
+        .sm-corner-tl { top: 10px; left: 10px; border-top: 2px solid var(--dorado); border-left: 2px solid var(--dorado); }
+        .sm-corner-tr { top: 10px; right: 10px; border-top: 2px solid var(--dorado); border-right: 2px solid var(--dorado); }
+        .sm-corner-bl { bottom: 10px; left: 10px; border-bottom: 2px solid var(--dorado); border-left: 2px solid var(--dorado); }
+        .sm-corner-br { bottom: 10px; right: 10px; border-bottom: 2px solid var(--dorado); border-right: 2px solid var(--dorado); }
+        #sm-loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; background: #030201; }
+        .sm-spinner { width: 30px; height: 30px; border: 3px solid #1a1000; border-top-color: var(--dorado); border-radius: 50%; animation: smSpin 0.8s linear infinite; }
+        @keyframes smSpin { to{transform:rotate(360deg)} }
+        .sm-score-section { display: flex; flex-direction: column; align-items: center; padding: 0.7rem 1rem 0; flex-shrink: 0; }
+        .sm-ring-wrap { position: relative; width: 72px; height: 72px; }
+        .sm-ring { width: 72px; height: 72px; transform: rotate(-90deg); }
+        .sm-bg-circle { fill: none; stroke: #1a1000; stroke-width: 7; }
+        .sm-arc { fill: none; stroke: var(--dorado); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 175.9; stroke-dashoffset: 175.9; transition: stroke-dashoffset 0.6s ease, stroke 0.6s ease; }
+        .sm-score-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .sm-score-num { font-size: 1.15rem; font-weight: 900; color: #fff; line-height: 1; }
+        .sm-score-label { font-size: 0.44rem; color: #555; letter-spacing: 1.5px; text-transform: uppercase; }
+        .sm-caption { font-size: 0.6rem; color: #444; margin-top: 0.28rem; }
+        .sm-chips { display: flex; gap: 0.4rem; padding: 0.5rem 1rem; flex-shrink: 0; }
+        .sm-chip { flex: 1; text-align: center; padding: 0.45rem 0.2rem; border-radius: 9px; border: 1px solid #2a2000; background: #1a1200; color: #333; transition: all 0.35s; font-size: 0.6rem; }
+        .sm-chip .ci { display: block; font-size: 0.85rem; margin-bottom: 0.1rem; }
+        .sm-chip .cl { display: block; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase; }
+        .sm-chip .cv { display: block; font-size: 0.55rem; margin-top: 0.1rem; opacity: 0.7; }
+        .sm-chip.ok { background: #071a03; color: #4ade80; border-color: #14532d55; }
+        .sm-chip.warn { background: #1a1100; color: #fbbf24; border-color: #92400e55; }
+        .sm-chip.mal { background: #1a0303; color: #f87171; border-color: #7f1d1d55; }
+        .sm-footer { padding: 0.5rem 1rem 1rem; flex-shrink: 0; }
+        .sm-btn-analizar { width: 100%; padding: 0.85rem; border: none; border-radius: 10px; font-size: 0.92rem; font-weight: 900; cursor: pointer; font-family: 'Raleway', sans-serif; background: linear-gradient(135deg, #C9A84C, #e5c05b); color: var(--negro); transition: all 0.2s; letter-spacing: 0.3px; }
+        .sm-btn-analizar:disabled { opacity: 0.28; cursor: not-allowed; background: #2a2000; color: #555; }
+        .sm-btn-analizar:not(:disabled):hover { transform: scale(1.01); box-shadow: 0 4px 20px rgba(201,168,76,0.3); }
+        .sm-pie { font-size: 0.62rem; color: #2a2a2a; text-align: center; margin-top: 0.35rem; }
+
+        /* Header scan btn */
+        .header-scan-btn { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; color: var(--dorado); text-decoration: none; font-weight: 700; border: 1px solid #C9A84C44; padding: 0.35rem 0.8rem; border-radius: 20px; background: transparent; cursor: pointer; font-family: inherit; transition: all 0.2s; animation: hdrScanPulse 2.5s ease-in-out infinite; }
+        .header-scan-btn:hover { background: #C9A84C18; border-color: var(--dorado); }
+        @keyframes hdrScanPulse { 0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.2)} 50%{box-shadow:0 0 0 4px rgba(201,168,76,0)} }
+        .hdr-dot { width: 5px; height: 5px; background: var(--dorado); border-radius: 50%; animation: badgeDot 1.4s ease-in-out infinite; }
     </style>
     <script defer src="/_vercel/insights/script.js"></script>
 </head>
@@ -500,9 +575,13 @@
     <!-- HEADER -->
     <header class="header">
         <a href="index.html" class="header-logo">Heyy<span>Sagash</span></a>
-        <div style="display:flex;align-items:center;gap:1rem;">
-            <a href="coach.html" style="font-size:0.8rem;color:#C9A84C;text-decoration:none;font-weight:700;border:1px solid #C9A84C44;padding:0.35rem 0.8rem;border-radius:20px;">✦ Coach</a>
-            <a href="index.html" class="header-volver">← Volver a la tienda principal</a>
+        <div style="display:flex;align-items:center;gap:0.7rem;">
+            <button class="header-scan-btn" onclick="abrirScan()">
+                <span class="hdr-dot"></span>
+                Escanear postura
+            </button>
+            <a href="coach.html" style="font-size:0.78rem;color:#C9A84C;text-decoration:none;font-weight:700;border:1px solid #C9A84C33;padding:0.35rem 0.75rem;border-radius:20px;">✦ Coach</a>
+            <a href="index.html" class="header-volver" style="display:none" id="volver-desktop">← Volver</a>
         </div>
     </header>
 
@@ -714,6 +793,35 @@
         </div>
     </section>
 
+    <!-- ====== SCAN DE POSTURA ====== -->
+    <section class="scan-section" id="scan-section">
+        <div class="container">
+            <div class="scan-badge">
+                <span class="scan-badge-dot"></span>
+                IA + Cámara en vivo
+            </div>
+            <h2>¿Cuál corrector es <em>el tuyo</em>?</h2>
+            <p class="scan-desc">
+                Escanea tu postura ahora mismo. La inteligencia artificial detecta qué necesita tu espalda y te dice exactamente cuál corrector es para ti.
+            </p>
+            <button class="btn-scan-grande" onclick="abrirScan()">
+                📷 &nbsp;Escanear mi postura ahora
+            </button>
+            <p class="scan-hint-text">Gratis · Sin registrarte · Resultado en 5 segundos</p>
+
+            <!-- Resultado recomendación -->
+            <div class="rec-card" id="rec-card">
+                <div class="rec-label">📊 Tu diagnóstico postural recomienda</div>
+                <div class="rec-nombre" id="rec-nombre"></div>
+                <div class="rec-subtitulo" id="rec-subtitulo"></div>
+                <div class="rec-razon" id="rec-razon"></div>
+                <div class="rec-precio" id="rec-precio"></div>
+                <button class="rec-cta" id="rec-cta" onclick="">Pedirlo ahora →</button>
+                <button class="rec-rescan" onclick="abrirScan()">↺ &nbsp;Escanear de nuevo</button>
+            </div>
+        </div>
+    </section>
+
     <!-- ====== CIERRE ====== -->
     <section class="cierre">
         <div class="container">
@@ -729,6 +837,54 @@
     <footer>
         © HeyySagash · Tu bienestar, nuestra pasión
     </footer>
+
+    <!-- ===== SCAN MODAL ===== -->
+    <div id="scan-modal">
+        <div class="sm-header">
+            <div>
+                <div class="sm-titulo">📷 Análisis de postura IA</div>
+                <div class="sm-sub">Ponte de frente · posición normal · hombros visibles</div>
+            </div>
+            <button class="sm-cerrar" onclick="cerrarScan()">✕ Cerrar</button>
+        </div>
+        <div class="sm-video-area">
+            <video id="sm-video" playsinline autoplay muted></video>
+            <canvas id="sm-canvas"></canvas>
+            <div class="sm-scan-line" id="sm-scan-line"></div>
+            <div class="sm-corner sm-corner-tl"></div>
+            <div class="sm-corner sm-corner-tr"></div>
+            <div class="sm-corner sm-corner-bl"></div>
+            <div class="sm-corner sm-corner-br"></div>
+            <div id="sm-loading">
+                <div class="sm-spinner"></div>
+                <span style="color:#444;font-size:0.78rem">Iniciando cámara...</span>
+            </div>
+        </div>
+        <div class="sm-score-section">
+            <div class="sm-ring-wrap">
+                <svg class="sm-ring" viewBox="0 0 72 72">
+                    <circle class="sm-bg-circle" cx="36" cy="36" r="28"/>
+                    <circle class="sm-arc" id="sm-arc" cx="36" cy="36" r="28"/>
+                </svg>
+                <div class="sm-score-center">
+                    <div class="sm-score-num" id="sm-score-num">—</div>
+                    <div class="sm-score-label">postura</div>
+                </div>
+            </div>
+            <div class="sm-caption" id="sm-caption">Detectando posición...</div>
+        </div>
+        <div class="sm-chips">
+            <div class="sm-chip" id="sm-chip-h"><span class="ci">⚖️</span><span class="cl">Hombros</span><span class="cv" id="sm-val-h">—</span></div>
+            <div class="sm-chip" id="sm-chip-c"><span class="ci">🧠</span><span class="cl">Cabeza</span><span class="cv" id="sm-val-c">—</span></div>
+            <div class="sm-chip" id="sm-chip-s"><span class="ci">🦴</span><span class="cl">Columna</span><span class="cv" id="sm-val-s">—</span></div>
+        </div>
+        <div class="sm-footer">
+            <button class="sm-btn-analizar" id="sm-btn-analizar" disabled onclick="verRecomendacion()">
+                Ver qué corrector me conviene →
+            </button>
+            <p class="sm-pie">Analizamos tu postura y te decimos exactamente cuál es el tuyo</p>
+        </div>
+    </div>
 
     <!-- ===== MODAL PEDIDO ===== -->
     <div id="modal-pedido" style="display:none;position:fixed;inset:0;background:#000000cc;z-index:10000;align-items:center;justify-content:center;padding:1rem;">
@@ -870,6 +1026,152 @@
             requestAnimationFrame(animar);
         }
         animar();
+
+        // ===== SCAN DE POSTURA =====
+        const SM_CIRC = 2 * Math.PI * 28;
+        let smStream = null, smRunning = false, smPose = null, smCamUtil = null;
+        let smHScore = 0, smCScore = 0, smSScore = 0;
+
+        async function abrirScan() {
+            const modal = document.getElementById('scan-modal');
+            const loading = document.getElementById('sm-loading');
+            const canvas = document.getElementById('sm-canvas');
+            modal.style.display = 'flex';
+            loading.style.display = 'flex'; canvas.style.display = 'none';
+            document.getElementById('sm-btn-analizar').disabled = true;
+            document.getElementById('sm-arc').style.strokeDashoffset = SM_CIRC;
+            document.getElementById('sm-score-num').textContent = '—';
+            document.getElementById('sm-caption').textContent = 'Detectando posición...';
+            resetSmChips();
+            try {
+                await cargarMP();
+                smStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
+                const video = document.getElementById('sm-video');
+                video.srcObject = smStream;
+                await new Promise(r => { video.onloadedmetadata = r; });
+                await video.play();
+                canvas.width = video.videoWidth || 640;
+                canvas.height = video.videoHeight || 480;
+                canvas.style.display = 'block'; loading.style.display = 'none';
+                document.getElementById('sm-scan-line').style.display = 'block';
+
+                smPose = new Pose({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}` });
+                smPose.setOptions({ modelComplexity: 1, smoothLandmarks: true, enableSegmentation: false, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+                smPose.onResults(onSmResults);
+                smRunning = true;
+                smCamUtil = new Camera(video, {
+                    onFrame: async () => { if (smRunning && smPose) await smPose.send({ image: video }); },
+                    width: canvas.width, height: canvas.height
+                });
+                smCamUtil.start();
+            } catch(e) {
+                loading.innerHTML = `<span style="color:#f87171;font-size:0.82rem;text-align:center;padding:1rem">No se pudo acceder a la cámara.<br>Revisa los permisos del navegador.</span>`;
+            }
+        }
+
+        function onSmResults(results) {
+            const canvas = document.getElementById('sm-canvas'), ctx = canvas.getContext('2d');
+            const W = canvas.width, H = canvas.height;
+            ctx.save(); ctx.translate(W, 0); ctx.scale(-1, 1); ctx.drawImage(results.image, 0, 0, W, H); ctx.restore();
+            if (!results.poseLandmarks) return;
+            const lm = results.poseLandmarks, ml = lm.map(p => ({ ...p, x: 1 - p.x }));
+            const conns = [[11,12],[11,23],[12,24],[23,24],[11,13],[12,14],[0,11],[0,12]];
+            ctx.strokeStyle = '#C9A84C55'; ctx.lineWidth = 2;
+            conns.forEach(([a, b]) => {
+                if (ml[a].visibility > 0.35 && ml[b].visibility > 0.35) {
+                    ctx.beginPath(); ctx.moveTo(ml[a].x*W, ml[a].y*H); ctx.lineTo(ml[b].x*W, ml[b].y*H); ctx.stroke();
+                }
+            });
+            [0, 11, 12, 23, 24].forEach(i => {
+                if (ml[i].visibility > 0.35) {
+                    ctx.beginPath(); ctx.arc(ml[i].x*W, ml[i].y*H, 5, 0, Math.PI*2);
+                    ctx.fillStyle = '#C9A84C'; ctx.fill();
+                    ctx.strokeStyle = '#00000088'; ctx.lineWidth = 1.5; ctx.stroke();
+                }
+            });
+            actualizarSmIndicadores(lm);
+            document.getElementById('sm-btn-analizar').disabled = false;
+        }
+
+        function actualizarSmIndicadores(lm) {
+            const ls = lm[11], rs = lm[12], lh = lm[23], rh = lm[24], nose = lm[0];
+            if (ls.visibility < 0.3 || rs.visibility < 0.3) return;
+            const hDiff = Math.abs(ls.y - rs.y);
+            const sMidX = (ls.x + rs.x) / 2;
+            const hOff = Math.abs(nose.x - sMidX);
+            const hipMidX = (lh.visibility > 0.3 && rh.visibility > 0.3) ? (lh.x + rh.x) / 2 : sMidX;
+            const spOff = Math.abs(sMidX - hipMidX);
+            const hOk = hDiff < 0.03, hWarn = hDiff < 0.07;
+            const cOk = hOff < 0.04,  cWarn = hOff < 0.09;
+            const sOk = spOff < 0.04, sWarn = spOff < 0.09;
+            smHScore = hOk ? 0 : hWarn ? 1 : 2;
+            smCScore = cOk ? 0 : cWarn ? 1 : 2;
+            smSScore = sOk ? 0 : sWarn ? 1 : 2;
+            setSmChip('sm-chip-h', 'sm-val-h', hOk?'ok':hWarn?'warn':'mal', hOk?'Nivelados':ls.y<rs.y?'Izq. elevado':'Der. elevado');
+            setSmChip('sm-chip-c', 'sm-val-c', cOk?'ok':cWarn?'warn':'mal', cOk?'Centrada':cWarn?'Leve desvío':'Adelantada');
+            setSmChip('sm-chip-s', 'sm-val-s', sOk?'ok':sWarn?'warn':'mal', sOk?'Alineada':sWarn?'Leve desvío':'Desviada');
+            const pts = s => s === 0 ? 100 : s === 1 ? 55 : 10;
+            const score = Math.round(pts(smHScore)*0.35 + pts(smCScore)*0.35 + pts(smSScore)*0.30);
+            const arc = document.getElementById('sm-arc');
+            arc.style.strokeDasharray = SM_CIRC;
+            arc.style.strokeDashoffset = SM_CIRC * (1 - score / 100);
+            arc.style.stroke = score >= 80 ? '#4ade80' : score >= 55 ? '#C9A84C' : '#f87171';
+            const numEl = document.getElementById('sm-score-num');
+            numEl.textContent = score + '%';
+            numEl.style.color = score >= 80 ? '#4ade80' : score >= 55 ? '#e5c05b' : '#f87171';
+            document.getElementById('sm-caption').textContent = score >= 80 ? 'Excelente postura' : score >= 55 ? 'Postura aceptable' : 'Necesita mejorar';
+        }
+
+        function setSmChip(chipId, valId, cls, texto) {
+            document.getElementById(chipId).className = 'sm-chip ' + cls;
+            document.getElementById(valId).textContent = texto;
+        }
+        function resetSmChips() {
+            ['sm-chip-h','sm-chip-c','sm-chip-s'].forEach(id => document.getElementById(id).className = 'sm-chip');
+            ['sm-val-h','sm-val-c','sm-val-s'].forEach(id => document.getElementById(id).textContent = '—');
+        }
+
+        function cerrarScan() {
+            smRunning = false;
+            if (smCamUtil) { try { smCamUtil.stop(); } catch(e) {} smCamUtil = null; }
+            if (smStream) { smStream.getTracks().forEach(t => t.stop()); smStream = null; }
+            smPose = null;
+            document.getElementById('sm-scan-line').style.display = 'none';
+            document.getElementById('scan-modal').style.display = 'none';
+        }
+
+        function getRecomendacion() {
+            // Restaurador Total: problemas serios en hombros o columna, o múltiples zonas afectadas
+            if (smHScore === 2 || smSScore === 2 || (smHScore >= 1 && smSScore >= 1)) {
+                return { nombre: 'Restaurador Total', subtitulo: 'Soporte Integral', precio: '$89.900', razon: 'Tu espalda necesita soporte completo en hombros y lumbar. El Restaurador Total actúa en toda la columna y es el corrector más efectivo para corregir desde la base cuando el problema lleva tiempo.', producto: 'Corrector Restaurador Total — Soporte Integral' };
+            }
+            // Estructurado X: cabeza adelantada con hombros relativamente bien → activo, necesita tirar hacia atrás
+            if (smCScore >= 1 && smHScore === 0) {
+                return { nombre: 'Estructurado X', subtitulo: 'Diseño en X', precio: '$69.900', razon: 'Tus hombros están bien alineados pero hay tensión en el cuello y cabeza adelantada. El Estructurado X corrige eso con libertad de movimiento — perfecto si eres activo y necesitas corrección sin rigidez.', producto: 'Corrector Estructurado X — Diseño en X' };
+            }
+            // Discreto Diario: mejora moderada necesaria
+            return { nombre: 'Discreto Diario', subtitulo: 'Soporte de Hombros', precio: '$59.900', razon: 'Tu postura tiene margen de mejora en los hombros. El Discreto Diario se usa invisible bajo la ropa y enseña a tu cuerpo la posición correcta en pocas semanas — sin que nadie lo note.', producto: 'Corrector Discreto Diario — Soporte de Hombros' };
+        }
+
+        function verRecomendacion() {
+            cerrarScan();
+            const rec = getRecomendacion();
+            document.getElementById('rec-nombre').textContent = rec.nombre;
+            document.getElementById('rec-subtitulo').textContent = rec.subtitulo;
+            document.getElementById('rec-razon').textContent = rec.razon;
+            document.getElementById('rec-precio').textContent = rec.precio;
+            document.getElementById('rec-cta').onclick = () => abrirModal(rec.producto, rec.precio);
+            const card = document.getElementById('rec-card');
+            card.style.display = 'block';
+            setTimeout(() => document.getElementById('scan-section').scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+        }
+
+        async function cargarMP() {
+            if (window._mpLoaded) return;
+            await Promise.all([loadSc('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js'), loadSc('https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js'), loadSc('https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js')]);
+            window._mpLoaded = true;
+        }
+        function loadSc(src) { return new Promise((res, rej) => { const s = document.createElement('script'); s.src = src; s.crossOrigin = 'anonymous'; s.onload = res; s.onerror = rej; document.head.appendChild(s); }); }
 
         // ===== Fade-in al hacer scroll =====
         const observer = new IntersectionObserver((entries) => {

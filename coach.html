@@ -6,739 +6,880 @@
     <title>Coach Postural · HeyySagash</title>
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --dorado: #C9A84C; --dorado-claro: #e5c05b; --negro: #0a0702; --negro-medio: #150d00; --negro-card: #1a1200; }
+        body { background: var(--negro); color: #fff; font-family: 'Inter', Arial, sans-serif; min-height: 100vh; overflow: hidden; }
+        #particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
 
-        :root {
-            --dorado: #C9A84C;
-            --dorado-claro: #e5c05b;
-            --negro: #0a0702;
-            --negro-medio: #150d00;
-            --negro-card: #1a1200;
-        }
-
-        body {
-            background: var(--negro);
-            color: #fff;
-            font-family: 'Inter', Arial, sans-serif;
-            min-height: 100vh;
-        }
-
-        /* ===== AUTH ===== */
-        #pantalla-auth {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem 1.2rem;
-            gap: 1.4rem;
-        }
-
+        /* AUTH */
+        #pantalla-auth { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1.2rem; gap: 1.4rem; }
         .auth-logo { width: 68px; border-radius: 10px; }
-
         .auth-titulo { text-align: center; }
         .auth-titulo h1 { font-size: 1.45rem; font-weight: 900; color: var(--dorado-claro); }
         .auth-titulo p { font-size: 0.85rem; color: #777; margin-top: 0.3rem; }
-
-        .auth-tabs {
-            display: flex;
-            background: var(--negro-medio);
-            border-radius: 8px;
-            padding: 3px;
-            width: 100%;
-            max-width: 340px;
-        }
-
-        .auth-tab {
-            flex: 1;
-            padding: 0.5rem;
-            text-align: center;
-            cursor: pointer;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #666;
-            transition: all 0.2s;
-            user-select: none;
-        }
+        .auth-tabs { display: flex; background: var(--negro-medio); border-radius: 8px; padding: 3px; width: 100%; max-width: 340px; }
+        .auth-tab { flex: 1; padding: 0.5rem; text-align: center; cursor: pointer; border-radius: 6px; font-size: 0.9rem; font-weight: 600; color: #666; transition: all 0.2s; user-select: none; }
         .auth-tab.activo { background: var(--dorado); color: var(--negro); }
-
-        .auth-form {
-            width: 100%;
-            max-width: 340px;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .auth-form input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background: var(--negro-medio);
-            border: 1px solid #2a2000;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 0.95rem;
-            outline: none;
-            transition: border-color 0.2s;
-            font-family: inherit;
-        }
+        .auth-form { width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 0.75rem; }
+        .auth-form input { width: 100%; padding: 0.75rem 1rem; background: var(--negro-medio); border: 1px solid #2a2000; border-radius: 8px; color: #fff; font-size: 0.95rem; outline: none; transition: border-color 0.2s; font-family: inherit; }
         .auth-form input:focus { border-color: var(--dorado); }
         .auth-form input::placeholder { color: #444; }
-
-        .btn-primario {
-            padding: 0.85rem;
-            background: var(--dorado);
-            color: var(--negro);
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 800;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-family: inherit;
-        }
+        .btn-primario { padding: 0.85rem; background: var(--dorado); color: var(--negro); border: none; border-radius: 8px; font-size: 1rem; font-weight: 800; cursor: pointer; transition: background 0.2s; font-family: inherit; }
         .btn-primario:hover { background: var(--dorado-claro); }
         .btn-primario:disabled { opacity: 0.5; cursor: not-allowed; }
+        .auth-error { font-size: 0.82rem; color: #e05252; text-align: center; display: none; padding: 0.5rem; background: #e0525215; border-radius: 6px; }
 
-        .auth-error {
-            font-size: 0.82rem;
-            color: #e05252;
-            text-align: center;
-            display: none;
-            padding: 0.5rem;
-            background: #e0525215;
-            border-radius: 6px;
-        }
-
-        /* ===== ONBOARDING ===== */
-        #modal-onboarding {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.88);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-            padding: 1.2rem;
-            overflow-y: auto;
-        }
-
-        .onboarding-box {
-            background: var(--negro-card);
-            border: 1px solid #2a2000;
-            border-radius: 16px;
-            padding: 1.8rem 1.5rem;
-            width: 100%;
-            max-width: 420px;
-            display: flex;
-            flex-direction: column;
-            gap: 1.1rem;
-            margin: auto;
-        }
-
+        /* ONBOARDING */
+        #modal-onboarding { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 100; align-items: center; justify-content: center; padding: 1.2rem; overflow-y: auto; }
+        .onboarding-box { background: var(--negro-card); border: 1px solid #2a2000; border-radius: 16px; padding: 1.8rem 1.5rem; width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 1.1rem; margin: auto; }
         .onboarding-box h2 { font-size: 1.2rem; color: var(--dorado-claro); font-weight: 800; }
         .onboarding-box > div > p { font-size: 0.87rem; color: #888; margin-top: 0.3rem; }
-
-        .ob-label {
-            display: block;
-            font-size: 0.82rem;
-            color: #bbb;
-            font-weight: 600;
-            margin-bottom: 0.4rem;
-            letter-spacing: 0.3px;
-        }
-
-        .ob-select, .ob-input {
-            width: 100%;
-            padding: 0.7rem 0.9rem;
-            background: var(--negro-medio);
-            border: 1px solid #2a2000;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 0.9rem;
-            outline: none;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
+        .ob-label { display: block; font-size: 0.82rem; color: #bbb; font-weight: 600; margin-bottom: 0.4rem; }
+        .ob-select, .ob-input { width: 100%; padding: 0.7rem 0.9rem; background: var(--negro-medio); border: 1px solid #2a2000; border-radius: 8px; color: #fff; font-size: 0.9rem; outline: none; font-family: inherit; transition: border-color 0.2s; }
         .ob-select:focus, .ob-input:focus { border-color: var(--dorado); }
         .ob-select option { background: #150d00; }
-
-        .dolores-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.45rem;
-        }
-
-        .dolor-check {
-            display: flex;
-            align-items: center;
-            gap: 0.45rem;
-            background: var(--negro-medio);
-            border: 1px solid #2a2000;
-            border-radius: 8px;
-            padding: 0.5rem 0.7rem;
-            cursor: pointer;
-            font-size: 0.83rem;
-            transition: border-color 0.2s;
-            user-select: none;
-        }
+        .dolores-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; }
+        .dolor-check { display: flex; align-items: center; gap: 0.45rem; background: var(--negro-medio); border: 1px solid #2a2000; border-radius: 8px; padding: 0.5rem 0.7rem; cursor: pointer; font-size: 0.83rem; transition: border-color 0.2s; user-select: none; }
         .dolor-check input[type=checkbox] { accent-color: var(--dorado); width: 14px; height: 14px; }
         .dolor-check:has(input:checked) { border-color: var(--dorado); color: var(--dorado-claro); }
 
-        /* ===== CHAT ===== */
-        #pantalla-chat {
-            display: none;
-            flex-direction: column;
-            height: 100vh;
-            height: 100dvh;
-        }
+        /* CHAT LAYOUT */
+        #pantalla-chat { position: relative; z-index: 1; display: none; flex-direction: column; height: 100vh; height: 100dvh; }
 
-        .chat-header {
-            background: var(--negro-medio);
-            border-bottom: 1px solid #2a2000;
-            padding: 0.85rem 1.1rem;
+        /* HEADER */
+        .chat-header { background: var(--negro-medio); border-bottom: 1px solid #2a2000; padding: 0.6rem 1rem; display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+        .chat-header img { width: 28px; height: 28px; border-radius: 5px; object-fit: cover; }
+        .chat-header-info { flex: 1; min-width: 0; }
+        .chat-header-info .nombre { font-weight: 800; font-size: 0.85rem; color: var(--dorado-claro); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chips { display: flex; gap: 0.3rem; margin-top: 0.2rem; }
+        .chip { font-size: 0.58rem; padding: 0.12rem 0.45rem; border-radius: 20px; font-weight: 700; white-space: nowrap; }
+        .chip-corrector { background: #C9A84C18; color: var(--dorado); border: 1px solid #C9A84C33; }
+        .chip-semanas { background: transparent; color: #555; border: 1px solid #2a2000; }
+
+        /* SCAN BUTTON — el protagonista */
+        .btn-scan {
+            position: relative;
+            background: linear-gradient(135deg, #1e1400, #2a1c00);
+            border: 1px solid var(--dorado);
+            color: var(--dorado);
+            padding: 0.38rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            font-family: inherit;
             display: flex;
             align-items: center;
-            gap: 0.85rem;
+            gap: 0.35rem;
             flex-shrink: 0;
-        }
-
-        .chat-header img { width: 36px; border-radius: 6px; flex-shrink: 0; }
-
-        .chat-header-info { flex: 1; min-width: 0; }
-        .chat-header-info .nombre {
-            font-weight: 800;
-            font-size: 0.92rem;
-            color: var(--dorado-claro);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .chat-header-info .corrector-tag { font-size: 0.73rem; color: #666; margin-top: 1px; }
-
-        .btn-salir-chat {
-            background: transparent;
-            border: 1px solid #333;
-            color: #666;
-            padding: 0.38rem 0.75rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.78rem;
-            font-family: inherit;
-            flex-shrink: 0;
+            animation: scanGlow 2.5s ease-in-out infinite;
             transition: all 0.2s;
         }
-        .btn-salir-chat:hover { border-color: #555; color: #aaa; }
-
-        .chat-mensajes {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem 1rem 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
+        .btn-scan:hover { background: linear-gradient(135deg, #2a1c00, #3a2800); transform: scale(1.03); }
+        @keyframes scanGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.25), 0 0 8px rgba(201,168,76,0.08); }
+            50% { box-shadow: 0 0 0 4px rgba(201,168,76,0.06), 0 0 18px rgba(201,168,76,0.18); }
         }
-
-        .burbuja {
-            max-width: 82%;
-            padding: 0.7rem 0.95rem;
-            border-radius: 14px;
-            font-size: 0.88rem;
-            line-height: 1.55;
+        .scan-live-dot {
+            width: 7px; height: 7px;
+            background: var(--dorado);
+            border-radius: 50%;
+            animation: dotLive 1.4s ease-in-out infinite;
         }
-
-        .burbuja.coach {
-            background: var(--negro-card);
-            border: 1px solid #2a2000;
-            align-self: flex-start;
-            border-radius: 2px 14px 14px 14px;
-        }
-
-        .burbuja.usuario {
+        @keyframes dotLive { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.35; transform: scale(0.7); } }
+        .btn-scan .nuevo-badge {
+            position: absolute;
+            top: -7px; right: -5px;
             background: var(--dorado);
             color: var(--negro);
-            align-self: flex-end;
-            border-radius: 14px 2px 14px 14px;
-            font-weight: 600;
-        }
-
-        .burbuja.cargando { color: #555; font-style: italic; }
-
-        .coach-badge {
-            font-size: 0.68rem;
-            color: var(--dorado);
-            font-weight: 700;
+            font-size: 0.46rem;
+            font-weight: 900;
+            padding: 0.1rem 0.3rem;
+            border-radius: 4px;
             letter-spacing: 0.5px;
-            margin-bottom: 0.3rem;
         }
 
-        .burbuja p { white-space: pre-wrap; }
+        .header-actions { display: flex; gap: 0.35rem; align-items: center; flex-shrink: 0; }
+        .btn-hdr { background: transparent; border: 1px solid #2a2000; color: #555; padding: 0.28rem 0.5rem; border-radius: 6px; cursor: pointer; font-size: 0.7rem; font-family: inherit; transition: all 0.2s; }
+        .btn-hdr.btn-del:hover { border-color: #8b2020; color: #c05252; }
+        .btn-hdr:hover { border-color: #444; color: #aaa; }
 
-        .chat-input-area {
-            padding: 0.75rem 0.9rem;
-            background: var(--negro-medio);
-            border-top: 1px solid #2a2000;
+        /* OWL */
+        .owl-zone { flex-shrink: 0; display: flex; align-items: center; justify-content: center; gap: 1.2rem; padding: 1rem 1.5rem 0.5rem; height: 175px; }
+        .owl-wrap { perspective: 900px; flex-shrink: 0; }
+        .owl-scene { width: 110px; height: 110px; transform-style: preserve-3d; transition: transform 0.15s ease-out; animation: owlFloat 4s ease-in-out infinite; border-radius: 50%; }
+        .owl-scene img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; filter: drop-shadow(0 0 18px rgba(201,168,76,0.6)) drop-shadow(0 0 5px rgba(201,168,76,0.25)); display: block; transition: filter 0.3s; }
+        @keyframes owlFloat { 0%,100%{transform:translateY(0) rotate(0deg)} 35%{transform:translateY(-10px) rotate(1.5deg)} 70%{transform:translateY(-5px) rotate(-1deg)} }
+        .owl-scene.thinking { animation: owlThink 0.5s ease-in-out infinite !important; }
+        .owl-scene.thinking img { filter: drop-shadow(0 0 28px rgba(201,168,76,1)) drop-shadow(0 0 12px rgba(201,168,76,0.6)); }
+        @keyframes owlThink { 0%,100%{transform:rotate(-6deg) translateY(-3px)} 50%{transform:rotate(6deg) translateY(-9px)} }
+        .owl-scene.respond { animation: owlBounce 0.55s ease-out; }
+        @keyframes owlBounce { 0%{transform:scale(1)} 35%{transform:scale(1.15) translateY(-8px) rotate(3deg)} 65%{transform:scale(0.96) rotate(-1deg)} 100%{transform:scale(1)} }
+
+        /* SPEECH BUBBLE */
+        .speech-bubble { flex: 1; max-width: 185px; background: var(--negro-card); border: 1px solid #2a2000; border-left: 3px solid var(--dorado); border-radius: 0 14px 14px 14px; padding: 0.7rem 0.85rem; font-size: 0.78rem; line-height: 1.6; opacity: 0; transform: scale(0.88) translateX(-8px); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; }
+        .speech-bubble .coach-tag { font-size: 0.58rem; color: var(--dorado); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 0.3rem; }
+        .speech-bubble .bubble-text { color: #ccc; }
+        .speech-bubble.visible { opacity: 1; transform: scale(1) translateX(0); }
+
+        /* PROMO CÁMARA — la joya */
+        .cam-promo-card {
+            margin: 0.5rem 1rem 0;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #1a1200, #0f0d02);
+            border: 1px solid #C9A84C55;
+            border-radius: 14px;
+            padding: 0.9rem 1rem;
             display: flex;
-            gap: 0.55rem;
-            align-items: flex-end;
-            flex-shrink: 0;
-        }
-
-        .chat-input {
-            flex: 1;
-            background: var(--negro-card);
-            border: 1px solid #2a2000;
-            border-radius: 10px;
-            padding: 0.65rem 0.9rem;
-            color: #fff;
-            font-size: 0.9rem;
-            resize: none;
-            max-height: 110px;
-            outline: none;
-            font-family: inherit;
-            line-height: 1.5;
-            transition: border-color 0.2s;
-        }
-        .chat-input:focus { border-color: var(--dorado); }
-        .chat-input::placeholder { color: #444; }
-
-        .btn-enviar {
-            background: var(--dorado);
-            border: none;
-            border-radius: 10px;
-            padding: 0.65rem 0.9rem;
+            align-items: center;
+            gap: 0.9rem;
+            position: relative;
+            overflow: hidden;
             cursor: pointer;
-            font-size: 1rem;
-            color: var(--negro);
-            flex-shrink: 0;
-            transition: background 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            animation: promoAppear 0.5s ease both;
         }
+        .cam-promo-card:hover { border-color: var(--dorado); box-shadow: 0 0 20px rgba(201,168,76,0.1); }
+        @keyframes promoAppear { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+        .cam-promo-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -60%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(201,168,76,0.06), transparent);
+            animation: promoShine 3.5s ease-in-out infinite;
+        }
+        @keyframes promoShine { 0%,100% { left: -60%; } 50% { left: 110%; } }
+        .cam-promo-icon {
+            width: 44px; height: 44px;
+            background: radial-gradient(circle, #2a1c00, #1a1000);
+            border: 1px solid #C9A84C44;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            animation: iconPulse 2s ease-in-out infinite;
+        }
+        @keyframes iconPulse { 0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.3)} 50%{box-shadow:0 0 0 6px rgba(201,168,76,0)} }
+        .cam-promo-text { flex: 1; min-width: 0; }
+        .cam-promo-tag { font-size: 0.58rem; letter-spacing: 2.5px; color: var(--dorado); font-weight: 800; text-transform: uppercase; margin-bottom: 0.2rem; }
+        .cam-promo-title { font-size: 0.85rem; font-weight: 800; color: #fff; line-height: 1.3; }
+        .cam-promo-sub { font-size: 0.68rem; color: #666; margin-top: 0.15rem; }
+        .cam-promo-arrow { color: var(--dorado); font-size: 1rem; flex-shrink: 0; opacity: 0.7; }
+        .cam-promo-close { position: absolute; top: 0.4rem; right: 0.5rem; background: transparent; border: none; color: #333; font-size: 0.7rem; cursor: pointer; padding: 0.2rem; line-height: 1; }
+        .cam-promo-close:hover { color: #666; }
+
+        /* MENSAJES */
+        .chat-mensajes { flex: 1; overflow-y: auto; padding: 0.7rem 1rem; display: flex; flex-direction: column; gap: 0.55rem; }
+        .burbuja { max-width: 82%; padding: 0.6rem 0.85rem; border-radius: 12px; font-size: 0.84rem; line-height: 1.5; }
+        .burbuja.coach { background: var(--negro-card); border: 1px solid #2a2000; align-self: flex-start; border-radius: 2px 12px 12px 12px; }
+        .burbuja.usuario { background: var(--dorado); color: var(--negro); align-self: flex-end; border-radius: 12px 2px 12px 12px; font-weight: 600; }
+        .burbuja p { white-space: pre-wrap; }
+        .coach-badge { font-size: 0.63rem; color: var(--dorado); font-weight: 700; margin-bottom: 0.2rem; }
+        .typing-dots { display: flex; gap: 4px; align-items: center; padding: 3px 0; }
+        .typing-dots span { width: 6px; height: 6px; background: var(--dorado); border-radius: 50%; opacity: 0.4; animation: dotPulse 1.2s ease-in-out infinite; }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes dotPulse { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-5px);opacity:1} }
+
+        /* INPUT */
+        .chat-input-area { padding: 0.7rem 0.9rem; background: var(--negro-medio); border-top: 1px solid #2a2000; display: flex; gap: 0.55rem; align-items: flex-end; flex-shrink: 0; }
+        .chat-input { flex: 1; background: var(--negro-card); border: 1px solid #2a2000; border-radius: 10px; padding: 0.65rem 0.9rem; color: #fff; font-size: 0.88rem; resize: none; max-height: 90px; outline: none; font-family: inherit; line-height: 1.5; transition: border-color 0.2s; }
+        .chat-input:focus { border-color: var(--dorado); }
+        .chat-input::placeholder { color: #333; }
+        .btn-enviar { background: var(--dorado); border: none; border-radius: 10px; padding: 0.65rem 0.95rem; cursor: pointer; font-size: 1rem; color: var(--negro); flex-shrink: 0; transition: background 0.2s; }
         .btn-enviar:hover { background: var(--dorado-claro); }
         .btn-enviar:disabled { opacity: 0.35; cursor: not-allowed; }
 
-        /* ===== LOADING spinner ===== */
-        .dots::after {
-            content: '';
-            animation: dots 1.2s steps(4, end) infinite;
+        /* PROXIMAMENTE */
+        #pantalla-proximamente { position: relative; z-index: 1; display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; gap: 1.4rem; }
+
+        /* ══════════════════════════════════
+           CAMERA MODAL — experiencia completa
+           ══════════════════════════════════ */
+        #modal-camara { position: fixed; inset: 0; background: #000; z-index: 200; display: none; flex-direction: column; }
+
+        .cam-header { padding: 0.8rem 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1a1000; flex-shrink: 0; }
+        .cam-titulo-wrap { }
+        .cam-titulo { font-size: 0.68rem; letter-spacing: 3px; color: var(--dorado); font-weight: 800; text-transform: uppercase; }
+        .cam-sub { font-size: 0.62rem; color: #444; margin-top: 0.15rem; }
+        .btn-cam-cerrar { background: transparent; border: 1px solid #2a2000; color: #555; padding: 0.28rem 0.7rem; border-radius: 6px; cursor: pointer; font-family: inherit; font-size: 0.78rem; transition: all 0.2s; }
+        .btn-cam-cerrar:hover { border-color: #555; color: #aaa; }
+
+        /* Video area */
+        .cam-video-area { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #030201; min-height: 0; }
+        #cam-canvas { max-width: 100%; max-height: 100%; display: block; }
+        #cam-video { display: none; }
+
+        /* Scan line sweep */
+        .scan-line {
+            position: absolute; left: 0; right: 0; height: 2px; pointer-events: none;
+            background: linear-gradient(90deg, transparent 0%, #C9A84C99 40%, #C9A84Cff 50%, #C9A84C99 60%, transparent 100%);
+            animation: scanLine 2.2s ease-in-out infinite;
+            display: none;
         }
-        @keyframes dots {
-            0%   { content: '.'; }
-            25%  { content: '..'; }
-            50%  { content: '...'; }
-            75%  { content: ''; }
+        @keyframes scanLine { 0%{top:0;opacity:0} 5%{opacity:1} 90%{opacity:1} 100%{top:100%;opacity:0} }
+
+        /* Corner brackets */
+        .cam-corner { position: absolute; width: 20px; height: 20px; pointer-events: none; }
+        .cam-corner-tl { top: 12px; left: 12px; border-top: 2px solid var(--dorado); border-left: 2px solid var(--dorado); }
+        .cam-corner-tr { top: 12px; right: 12px; border-top: 2px solid var(--dorado); border-right: 2px solid var(--dorado); }
+        .cam-corner-bl { bottom: 12px; left: 12px; border-bottom: 2px solid var(--dorado); border-left: 2px solid var(--dorado); }
+        .cam-corner-br { bottom: 12px; right: 12px; border-bottom: 2px solid var(--dorado); border-right: 2px solid var(--dorado); }
+
+        /* Loading */
+        #cam-loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; background: #030201; }
+        .cam-spinner { width: 32px; height: 32px; border: 3px solid #1a1000; border-top-color: var(--dorado); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* SCORE RING */
+        .score-section { display: flex; flex-direction: column; align-items: center; padding: 0.8rem 1rem 0; flex-shrink: 0; }
+        .score-ring-wrap { position: relative; width: 80px; height: 80px; }
+        .score-ring { width: 80px; height: 80px; transform: rotate(-90deg); }
+        .score-bg-circle { fill: none; stroke: #1a1000; stroke-width: 7; }
+        .score-arc { fill: none; stroke: var(--dorado); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 197; stroke-dashoffset: 197; transition: stroke-dashoffset 0.6s ease, stroke 0.6s ease; }
+        .score-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .score-num { font-size: 1.3rem; font-weight: 900; color: #fff; line-height: 1; }
+        .score-label { font-size: 0.48rem; color: #555; letter-spacing: 1.5px; text-transform: uppercase; margin-top: 0.1rem; }
+        .score-caption { font-size: 0.62rem; color: #444; margin-top: 0.35rem; letter-spacing: 0.5px; }
+
+        /* Indicators */
+        .cam-indicators { display: flex; gap: 0.45rem; padding: 0.6rem 1rem; flex-shrink: 0; }
+        .postura-chip { flex: 1; text-align: center; padding: 0.5rem 0.25rem; border-radius: 10px; border: 1px solid #2a2000; background: var(--negro-card); color: #3a3a3a; transition: all 0.35s; }
+        .postura-chip .chip-icon { display: block; font-size: 0.9rem; margin-bottom: 0.12rem; }
+        .postura-chip .chip-label { display: block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+        .postura-chip .chip-val { display: block; font-size: 0.57rem; margin-top: 0.1rem; opacity: 0.7; }
+        .postura-chip.ok { background: #071a03; color: #4ade80; border-color: #14532d55; }
+        .postura-chip.warn { background: #1a1100; color: #fbbf24; border-color: #92400e55; }
+        .postura-chip.mal { background: #1a0303; color: #f87171; border-color: #7f1d1d55; }
+
+        /* Analyze button */
+        .cam-footer { padding: 0.55rem 1rem 1rem; flex-shrink: 0; }
+        .btn-analizar-ia {
+            width: 100%; padding: 0.82rem; border: none; border-radius: 10px;
+            font-size: 0.92rem; font-weight: 800; cursor: pointer; font-family: inherit;
+            background: linear-gradient(135deg, #C9A84C, #e5c05b);
+            color: var(--negro);
+            transition: all 0.2s;
+            letter-spacing: 0.3px;
         }
+        .btn-analizar-ia:disabled { opacity: 0.28; cursor: not-allowed; background: #2a2000; color: #555; }
+        .btn-analizar-ia:not(:disabled):hover { transform: scale(1.01); box-shadow: 0 4px 20px rgba(201,168,76,0.3); }
+        .cam-hint { font-size: 0.62rem; color: #333; text-align: center; margin-top: 0.4rem; }
+
+        @media (max-height: 640px) { .owl-zone { height: 145px; } .owl-scene, .owl-scene img { width: 85px; height: 85px; } }
     </style>
-    <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
-<!-- ===== PANTALLA: AUTH ===== -->
+<canvas id="particles"></canvas>
+
+<!-- AUTH -->
 <div id="pantalla-auth" style="display:none">
     <img class="auth-logo" src="fotooficial.png" alt="Sagash">
     <div class="auth-titulo">
         <h1>Coach de Postura</h1>
-        <p>Tu guía personalizada de HeyySagash</p>
+        <p>Tu guia personalizada de HeyySagash</p>
     </div>
-
     <div class="auth-tabs">
-        <div class="auth-tab activo" id="tab-login" onclick="cambiarTab('login')">Iniciar sesión</div>
+        <div class="auth-tab activo" id="tab-login" onclick="cambiarTab('login')">Iniciar sesion</div>
         <div class="auth-tab" id="tab-registro" onclick="cambiarTab('registro')">Registrarse</div>
     </div>
-
-    <!-- Login -->
     <div class="auth-form" id="form-login">
-        <input type="email" id="login-email" placeholder="Correo electrónico" autocomplete="email">
-        <input type="password" id="login-pass" placeholder="Contraseña" autocomplete="current-password">
-        <div class="auth-error" id="login-error">Correo o contraseña incorrectos</div>
-        <button class="btn-primario" id="btn-login" onclick="iniciarSesion()">Entrar →</button>
+        <input type="email" id="login-email" placeholder="Correo electronico" autocomplete="email">
+        <input type="password" id="login-pass" placeholder="Contrasena" autocomplete="current-password">
+        <div class="auth-error" id="login-error">Correo o contrasena incorrectos</div>
+        <button class="btn-primario" id="btn-login" onclick="iniciarSesion()">Entrar</button>
     </div>
-
-    <!-- Registro -->
     <div class="auth-form" id="form-registro" style="display:none">
         <input type="text" id="reg-nombre" placeholder="Nombre completo" autocomplete="name">
-        <input type="email" id="reg-email" placeholder="Correo electrónico" autocomplete="email">
-        <input type="password" id="reg-pass" placeholder="Contraseña (mín. 6 caracteres)" autocomplete="new-password">
+        <input type="email" id="reg-email" placeholder="Correo electronico" autocomplete="email">
+        <input type="password" id="reg-pass" placeholder="Contrasena (min. 6 caracteres)" autocomplete="new-password">
         <div class="auth-error" id="reg-error"></div>
-        <button class="btn-primario" id="btn-registro" onclick="registrarse()">Crear cuenta →</button>
+        <button class="btn-primario" id="btn-registro" onclick="registrarse()">Crear cuenta</button>
     </div>
 </div>
 
-<!-- ===== MODAL: ONBOARDING ===== -->
+<!-- ONBOARDING -->
 <div id="modal-onboarding">
     <div class="onboarding-box">
         <div>
-            <h2>¡Hola, <span id="ob-nombre">amigo/a</span>! 👋</h2>
-            <p>Cuéntanos sobre tu corrector para personalizar tu coach</p>
+            <h2>Hola, <span id="ob-nombre">amigo/a</span>!</h2>
+            <p>Cuentanos sobre tu corrector para personalizar tu coach</p>
         </div>
-
         <div>
-            <span class="ob-label">¿Qué corrector compraste?</span>
+            <span class="ob-label">Que corrector compraste?</span>
             <select class="ob-select" id="ob-corrector">
                 <option value="">Selecciona tu corrector</option>
                 <option value="Corrector Restaurador Total — Soporte Integral">Restaurador Total (Soporte Integral)</option>
                 <option value="Corrector Discreto Diario — Soporte de Hombros">Discreto Diario (Soporte de Hombros)</option>
-                <option value="Corrector Estructurado X — Diseño en X">Estructurado X (Diseño en X)</option>
+                <option value="Corrector Estructurado X — Diseno en X">Estructurado X (Diseno en X)</option>
             </select>
         </div>
-
         <div>
-            <span class="ob-label">¿Cuántas horas al día estás sentado/a?</span>
+            <span class="ob-label">Cuantas horas al dia estas sentado/a?</span>
             <select class="ob-select" id="ob-horas">
                 <option value="">Selecciona</option>
                 <option value="1-2 horas">1 a 2 horas</option>
                 <option value="3-5 horas">3 a 5 horas</option>
                 <option value="6-8 horas">6 a 8 horas</option>
-                <option value="más de 8 horas">Más de 8 horas</option>
+                <option value="mas de 8 horas">Mas de 8 horas</option>
             </select>
         </div>
-
         <div>
-            <span class="ob-label">¿Cuántas semanas llevas usándolo?</span>
+            <span class="ob-label">Cuantas semanas llevas usandolo?</span>
             <input class="ob-input" type="number" id="ob-semanas" min="0" max="52" placeholder="Ej: 2">
         </div>
-
         <div>
-            <span class="ob-label">¿Dónde sientes molestia? (puedes marcar varias)</span>
+            <span class="ob-label">Donde sientes molestia?</span>
             <div class="dolores-grid">
                 <label class="dolor-check"><input type="checkbox" value="cuello"> Cuello</label>
                 <label class="dolor-check"><input type="checkbox" value="hombros"> Hombros</label>
                 <label class="dolor-check"><input type="checkbox" value="espalda alta"> Espalda alta</label>
                 <label class="dolor-check"><input type="checkbox" value="espalda baja"> Espalda baja</label>
-                <label class="dolor-check"><input type="checkbox" value="ninguna"> Sin molestia aún</label>
+                <label class="dolor-check"><input type="checkbox" value="ninguna"> Sin molestia</label>
             </div>
         </div>
-
-        <button class="btn-primario" id="btn-onboarding" onclick="guardarPerfil()">Empezar con mi coach →</button>
+        <button class="btn-primario" id="btn-onboarding" onclick="guardarPerfil()">Empezar con mi coach</button>
     </div>
 </div>
 
-<!-- ===== PANTALLA: PRÓXIMAMENTE ===== -->
-<div id="pantalla-proximamente" style="display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;gap:1.4rem;">
-    <div style="font-size:3rem;">✦</div>
+<!-- PROXIMAMENTE -->
+<div id="pantalla-proximamente">
+    <div style="font-size:2.5rem">✦</div>
     <div>
-        <p style="font-size:0.75rem;letter-spacing:4px;color:var(--dorado);font-weight:700;margin-bottom:0.6rem;">ACCESO PERMANENTE RESERVADO</p>
-        <h2 style="font-size:1.5rem;font-weight:900;color:#fff;line-height:1.3;">El Coach estará<br>disponible próximamente</h2>
+        <p style="font-size:0.72rem;letter-spacing:4px;color:var(--dorado);font-weight:700;margin-bottom:0.6rem">ACCESO PERMANENTE RESERVADO</p>
+        <h2 style="font-size:1.5rem;font-weight:900;color:#fff;line-height:1.3">El Coach estara<br>disponible proximamente</h2>
     </div>
-    <p style="font-size:0.9rem;color:#666;max-width:300px;line-height:1.7;">Registraste tu lugar. Cuando lancemos oficialmente serás de los primeros en tener acceso.</p>
-    <div style="background:var(--negro-card);border:1px solid #2a2000;border-radius:12px;padding:1.2rem 1.8rem;">
-        <p style="font-size:0.8rem;color:#888;margin-bottom:0.3rem;">Tu corrector registrado</p>
-        <p style="font-size:0.95rem;font-weight:700;color:var(--dorado-claro);" id="prox-corrector">—</p>
+    <p style="font-size:0.88rem;color:#555;max-width:300px;line-height:1.7">Registraste tu lugar. Cuando lancemos seras de los primeros en tener acceso.</p>
+    <div style="background:var(--negro-card);border:1px solid #2a2000;border-radius:12px;padding:1.2rem 1.8rem">
+        <p style="font-size:0.78rem;color:#666;margin-bottom:0.3rem">Tu corrector registrado</p>
+        <p style="font-size:0.95rem;font-weight:700;color:var(--dorado-claro)" id="prox-corrector">sin registrar</p>
     </div>
-    <a href="index.html" style="font-size:0.85rem;color:#555;text-decoration:none;margin-top:0.5rem;">← Volver a la tienda</a>
-    <button onclick="cerrarSesion()" style="background:transparent;border:none;color:#333;font-size:0.78rem;cursor:pointer;font-family:inherit;">Cerrar sesión</button>
+    <a href="index.html" style="font-size:0.83rem;color:#444;text-decoration:none">Volver a la tienda</a>
+    <button onclick="cerrarSesion()" style="background:transparent;border:none;color:#2a2000;font-size:0.76rem;cursor:pointer;font-family:inherit">Cerrar sesion</button>
 </div>
 
-<!-- ===== PANTALLA: CHAT ===== -->
+<!-- CHAT -->
 <div id="pantalla-chat">
     <div class="chat-header">
         <img src="fotooficial.png" alt="Sagash">
         <div class="chat-header-info">
             <div class="nombre" id="chat-nombre">Usuario</div>
-            <div class="corrector-tag" id="chat-corrector">Coach de postura HeyySagash</div>
+            <div class="chips">
+                <span class="chip chip-corrector" id="chip-corrector"></span>
+                <span class="chip chip-semanas" id="chip-semanas"></span>
+            </div>
         </div>
-        <button class="btn-salir-chat" onclick="cerrarSesion()">Salir</button>
+        <div class="header-actions">
+            <!-- BOTÓN SCAN — protagonista del header -->
+            <button class="btn-scan" onclick="abrirCamara()">
+                <span class="scan-live-dot"></span>
+                Escanear postura
+                <span class="nuevo-badge">NUEVO</span>
+            </button>
+            <button class="btn-hdr btn-del" onclick="limpiarHistorial()" title="Borrar historial">🗑</button>
+            <button class="btn-hdr" onclick="cerrarSesion()">Salir</button>
+        </div>
     </div>
+
+    <div class="owl-zone">
+        <div class="owl-wrap">
+            <div class="owl-scene" id="owl-scene">
+                <img src="fotooficial.png" alt="Coach Sagash">
+            </div>
+        </div>
+        <div class="speech-bubble" id="speech-bubble">
+            <div class="coach-tag">Coach Sagash</div>
+            <div class="bubble-text" id="bubble-text">Hola! Estoy aqui para ayudarte.</div>
+        </div>
+    </div>
+
+    <!-- PROMO CÁMARA — se inyecta por JS la primera vez -->
+    <div id="cam-promo-zone"></div>
 
     <div class="chat-mensajes" id="chat-mensajes"></div>
 
     <div class="chat-input-area">
         <textarea class="chat-input" id="chat-input" rows="1"
-            placeholder="Pregúntame sobre tu postura..."
+            placeholder="Preguntale al coach..."
             onkeydown="teclaEnter(event)"
             oninput="autoResize(this)"></textarea>
-        <button class="btn-enviar" id="btn-enviar" onclick="enviarMensaje()">➤</button>
+        <button class="btn-enviar" id="btn-enviar" onclick="enviarMensaje()">&#10148;</button>
+    </div>
+</div>
+
+<!-- ══════════════════════════════
+     CAMERA MODAL
+     ══════════════════════════════ -->
+<div id="modal-camara">
+    <div class="cam-header">
+        <div class="cam-titulo-wrap">
+            <div class="cam-titulo">📷 Analisis de postura IA</div>
+            <div class="cam-sub">Ponte de frente · posicion normal · hombros visibles</div>
+        </div>
+        <button class="btn-cam-cerrar" onclick="cerrarCamara()">✕ Cerrar</button>
+    </div>
+
+    <div class="cam-video-area">
+        <video id="cam-video" playsinline autoplay muted></video>
+        <canvas id="cam-canvas"></canvas>
+        <div class="scan-line" id="scan-line"></div>
+        <div class="cam-corner cam-corner-tl"></div>
+        <div class="cam-corner cam-corner-tr"></div>
+        <div class="cam-corner cam-corner-bl"></div>
+        <div class="cam-corner cam-corner-br"></div>
+        <div id="cam-loading">
+            <div class="cam-spinner"></div>
+            <span style="color:#444;font-size:0.78rem">Iniciando camara...</span>
+        </div>
+    </div>
+
+    <!-- SCORE RING -->
+    <div class="score-section">
+        <div class="score-ring-wrap">
+            <svg class="score-ring" viewBox="0 0 80 80">
+                <circle class="score-bg-circle" cx="40" cy="40" r="31.5"/>
+                <circle class="score-arc" id="score-arc" cx="40" cy="40" r="31.5"/>
+            </svg>
+            <div class="score-center">
+                <div class="score-num" id="score-num">—</div>
+                <div class="score-label">postura</div>
+            </div>
+        </div>
+        <div class="score-caption" id="score-caption">Detectando posicion...</div>
+    </div>
+
+    <div class="cam-indicators">
+        <div class="postura-chip" id="pchip-hombros">
+            <span class="chip-icon">⚖️</span>
+            <span class="chip-label">Hombros</span>
+            <span class="chip-val" id="pval-hombros">—</span>
+        </div>
+        <div class="postura-chip" id="pchip-cabeza">
+            <span class="chip-icon">🧠</span>
+            <span class="chip-label">Cabeza</span>
+            <span class="chip-val" id="pval-cabeza">—</span>
+        </div>
+        <div class="postura-chip" id="pchip-columna">
+            <span class="chip-icon">🦴</span>
+            <span class="chip-label">Columna</span>
+            <span class="chip-val" id="pval-columna">—</span>
+        </div>
+    </div>
+
+    <div class="cam-footer">
+        <button class="btn-analizar-ia" id="btn-analizar-ia" disabled onclick="analizarConIA()">
+            Analizar con Coach IA →
+        </button>
+        <p class="cam-hint">La IA analiza tu foto y te da consejos personalizados segun tu corrector</p>
     </div>
 </div>
 
 <script>
-// ─── CONFIG ──────────────────────────────────────────────────────
 const APPS_URL = 'https://script.google.com/macros/s/AKfycbz5e9vRM0c2CWKRL8Bb66A2BjoT0w5C85a5J6l15UTR8tGz0dFzTYSRa89AXQ7ZrFB7/exec';
-const CLAUDE_KEY = 'TU_CLAVE_CLAUDE_AQUI'; // pega tu API key de Anthropic aquí
+const CLAUDE_KEY = 'TU_CLAVE_CLAUDE_AQUI';
 
-// ─── STATE ───────────────────────────────────────────────────────
-let usuario = null;
-let historial = [];
+let usuario = null, historial = [];
 
-// ─── JSONP ───────────────────────────────────────────────────────
-function jsonp(url) {
-    return new Promise((resolve, reject) => {
-        const cb = '_cb' + Date.now() + Math.random().toString(36).slice(2);
-        const script = document.createElement('script');
-        script.src = url + '&callback=' + cb;
-        const timer = setTimeout(() => {
-            delete window[cb];
-            document.body.removeChild(script);
-            reject(new Error('timeout'));
-        }, 10000);
-        window[cb] = data => {
-            clearTimeout(timer);
-            delete window[cb];
-            document.body.removeChild(script);
-            resolve(data);
-        };
-        script.onerror = () => { clearTimeout(timer); reject(new Error('red')); };
-        document.body.appendChild(script);
-    });
-}
-
-// ─── TABS ────────────────────────────────────────────────────────
-function cambiarTab(tab) {
-    document.getElementById('tab-login').classList.toggle('activo', tab === 'login');
-    document.getElementById('tab-registro').classList.toggle('activo', tab === 'registro');
-    document.getElementById('form-login').style.display = tab === 'login' ? 'flex' : 'none';
-    document.getElementById('form-registro').style.display = tab === 'registro' ? 'flex' : 'none';
-}
-
-// ─── REGISTRO ────────────────────────────────────────────────────
-async function registrarse() {
-    const nombre = document.getElementById('reg-nombre').value.trim();
-    const email  = document.getElementById('reg-email').value.trim().toLowerCase();
-    const pass   = document.getElementById('reg-pass').value;
-    const err    = document.getElementById('reg-error');
-    const btn    = document.getElementById('btn-registro');
-    err.style.display = 'none';
-
-    if (!nombre || !email || pass.length < 6) {
-        err.textContent = 'Completa todos los campos correctamente';
-        err.style.display = 'block';
-        return;
+// ── PARTICLES ──────────────────────────────────────────────
+(function() {
+    const canvas = document.getElementById('particles'), ctx = canvas.getContext('2d');
+    let W, H, pts;
+    const resize = () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; };
+    const mkPt = () => ({ x: Math.random()*W, y:H+10, r:Math.random()*1.4+0.3, vx:(Math.random()-0.5)*0.25, vy:-(Math.random()*0.4+0.15), a:Math.random()*0.55+0.1, life:Math.random() });
+    function init() { resize(); pts = Array.from({length:55}, mkPt); pts.forEach(p => p.y = Math.random()*H); }
+    function draw() {
+        ctx.clearRect(0,0,W,H);
+        pts.forEach((p,i) => {
+            p.x+=p.vx; p.y+=p.vy; p.life+=0.004;
+            if(p.y<-10||p.life>1) pts[i]=mkPt();
+            const a = p.a*Math.sin(Math.min(p.life,1)*Math.PI);
+            ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+            ctx.fillStyle=`rgba(201,168,76,${a.toFixed(2)})`; ctx.fill();
+        });
+        requestAnimationFrame(draw);
     }
+    window.addEventListener('resize', resize);
+    init(); draw();
+})();
 
-    btn.disabled = true;
-    btn.textContent = 'Creando cuenta...';
-    try {
-        const url = `${APPS_URL}?action=registro_usuario&nombre=${enc(nombre)}&email=${enc(email)}&password=${enc(pass)}`;
-        const res = await jsonp(url);
-        if (res.error) { err.textContent = res.error; err.style.display = 'block'; return; }
-        usuario = res.usuario;
-        guardarSesion();
-        mostrarOnboarding();
-    } catch(e) {
-        err.textContent = 'Error de conexión, intenta de nuevo';
-        err.style.display = 'block';
-    } finally {
-        btn.disabled = false;
-        btn.textContent = 'Crear cuenta →';
-    }
-}
+// ── OWL ────────────────────────────────────────────────────
+const owlScene = document.getElementById('owl-scene');
+const bubble   = document.getElementById('speech-bubble');
+const bubbleTxt = document.getElementById('bubble-text');
 
-// ─── LOGIN ───────────────────────────────────────────────────────
-async function iniciarSesion() {
-    const email = document.getElementById('login-email').value.trim().toLowerCase();
-    const pass  = document.getElementById('login-pass').value;
-    const err   = document.getElementById('login-error');
-    const btn   = document.getElementById('btn-login');
-    err.style.display = 'none';
+document.addEventListener('mousemove', e => {
+    const cx = window.innerWidth/2, cy = window.innerHeight*0.28;
+    const rotY = ((e.clientX-cx)/cx)*15, rotX = -((e.clientY-cy)/cy)*10;
+    owlScene.style.transform = `rotateX(${Math.max(-15,Math.min(15,rotX))}deg) rotateY(${Math.max(-18,Math.min(18,rotY))}deg)`;
+});
+function owlThink(on) { owlScene.classList.toggle('thinking', on); }
+function owlBounce() { owlScene.classList.remove('respond'); void owlScene.offsetWidth; owlScene.classList.add('respond'); setTimeout(()=>owlScene.classList.remove('respond'),600); }
+function showBubble(text) { bubbleTxt.textContent = text.length>130?text.slice(0,130)+'...':text; bubble.classList.add('visible'); }
+function hideBubble() { bubble.classList.remove('visible'); }
 
-    if (!email || !pass) { err.style.display = 'block'; return; }
-
-    btn.disabled = true;
-    btn.textContent = 'Entrando...';
-    try {
-        const url = `${APPS_URL}?action=login_usuario&email=${enc(email)}&password=${enc(pass)}`;
-        const res = await jsonp(url);
-        if (res.error) { err.style.display = 'block'; return; }
-        usuario = res.usuario;
-        guardarSesion();
-        if (!usuario.corrector) mostrarOnboarding();
-        else mostrarProximamente();
-    } catch(e) {
-        err.textContent = 'Error de conexión';
-        err.style.display = 'block';
-    } finally {
-        btn.disabled = false;
-        btn.textContent = 'Entrar →';
-    }
-}
-
-// ─── ONBOARDING ──────────────────────────────────────────────────
-function mostrarOnboarding() {
-    document.getElementById('pantalla-auth').style.display = 'none';
-    document.getElementById('ob-nombre').textContent = usuario.nombre.split(' ')[0];
-    document.getElementById('modal-onboarding').style.display = 'flex';
-}
-
-async function guardarPerfil() {
-    const corrector = document.getElementById('ob-corrector').value;
-    const horas     = document.getElementById('ob-horas').value;
-    const semanas   = document.getElementById('ob-semanas').value || '0';
-    const dolores   = [...document.querySelectorAll('.dolores-grid input:checked')].map(i => i.value).join(', ') || 'ninguna';
-    const btn       = document.getElementById('btn-onboarding');
-
-    if (!corrector || !horas) { alert('Selecciona tu corrector y las horas diarias'); return; }
-
-    btn.disabled = true;
-    btn.textContent = 'Guardando...';
-
-    usuario.corrector = corrector;
-    usuario.horas     = horas;
-    usuario.semanas   = semanas;
-    usuario.dolores   = dolores;
-    guardarSesion();
-
-    try {
-        const url = `${APPS_URL}?action=guardar_perfil&email=${enc(usuario.email)}&corrector=${enc(corrector)}&horas=${enc(horas)}&semanas=${enc(semanas)}&dolores=${enc(dolores)}`;
-        await jsonp(url);
-    } catch(e) { /* no crítico */ }
-
-    document.getElementById('modal-onboarding').style.display = 'none';
-    mostrarProximamente();
-}
-
-// ─── CHAT ────────────────────────────────────────────────────────
-function mostrarProximamente() {
-    document.getElementById('pantalla-auth').style.display = 'none';
-    document.getElementById('modal-onboarding').style.display = 'none';
-    document.getElementById('pantalla-chat').style.display = 'none';
-    document.getElementById('pantalla-proximamente').style.display = 'flex';
-    const cor = usuario.corrector ? usuario.corrector.split('—')[0].trim() : 'Sin registrar';
-    document.getElementById('prox-corrector').textContent = cor;
-}
-
-function agregarBurbuja(tipo, texto) {
+// ── TYPING ─────────────────────────────────────────────────
+let typingEl = null;
+function showTyping() {
     const cont = document.getElementById('chat-mensajes');
-    const div = document.createElement('div');
-    div.className = 'burbuja ' + tipo;
-    if (tipo === 'coach') {
-        const badge = document.createElement('div');
-        badge.className = 'coach-badge';
-        badge.textContent = '✦ Coach Sagash';
-        div.appendChild(badge);
-    }
-    const p = document.createElement('p');
-    p.textContent = texto;
-    div.appendChild(p);
-    cont.appendChild(div);
-    cont.scrollTop = cont.scrollHeight;
-    return div;
+    typingEl = document.createElement('div'); typingEl.className = 'burbuja coach';
+    typingEl.innerHTML = '<div class="coach-badge">Coach Sagash</div><div class="typing-dots"><span></span><span></span><span></span></div>';
+    cont.appendChild(typingEl); cont.scrollTop = cont.scrollHeight;
 }
+function hideTyping() { if(typingEl){ typingEl.remove(); typingEl=null; } }
 
-async function enviarMensaje() {
-    const input = document.getElementById('chat-input');
-    const texto = input.value.trim();
-    if (!texto) return;
-
-    const btn = document.getElementById('btn-enviar');
-    btn.disabled = true;
-    input.value = '';
-    input.style.height = 'auto';
-
-    agregarBurbuja('usuario', texto);
-    historial.push({ role: 'user', content: texto });
-
-    const burbujaCarga = agregarBurbuja('coach', '');
-    burbujaCarga.classList.add('cargando');
-    burbujaCarga.querySelector('p').innerHTML = '<span class="dots">Escribiendo</span>';
-
-    try {
-        const respuesta = await llamarClaude();
-        burbujaCarga.remove();
-        agregarBurbuja('coach', respuesta);
-        historial.push({ role: 'assistant', content: respuesta });
-        localStorage.setItem('chat_' + usuario.email, JSON.stringify(historial.slice(-30)));
-    } catch(e) {
-        burbujaCarga.remove();
-        const msg = e.message === 'key'
-            ? 'Falta configurar la clave de Claude. Contacta al administrador.'
-            : 'Tuve un problema al responder. ¿Puedes intentar de nuevo?';
-        agregarBurbuja('coach', msg);
-    }
-
-    btn.disabled = false;
-    input.focus();
+// ── TAB BLINK ──────────────────────────────────────────────
+const BASE_TITLE = 'Coach Postural · HeyySagash';
+let blinkTimer = null;
+function startTabBlink() {
+    if(document.hasFocus()||blinkTimer) return;
+    let tog = false;
+    blinkTimer = setInterval(()=>{ document.title = tog?'● Coach Sagash':BASE_TITLE; tog=!tog; },900);
+    window.addEventListener('focus', stopTabBlink, {once:true});
 }
+function stopTabBlink() { clearInterval(blinkTimer); blinkTimer=null; document.title=BASE_TITLE; }
 
-async function llamarClaude() {
-    if (CLAUDE_KEY === 'TU_CLAVE_CLAUDE_AQUI') throw new Error('key');
-
-    const sistema = `Eres un coach especializado en corrección postural de HeyySagash, una marca colombiana de correctores de postura.
-
-Perfil del usuario:
-- Nombre: ${usuario.nombre}
-- Corrector: ${usuario.corrector || 'no especificado'}
-- Horas sentado/a por día: ${usuario.horas || 'no especificado'}
-- Semanas usando el corrector: ${usuario.semanas || '0'}
-- Zonas de molestia: ${usuario.dolores || 'ninguna indicada'}
-
-Tu rol:
-- Da consejos prácticos y personalizados basados en el perfil del usuario
-- Sugiere ejercicios de estiramiento, pausas activas y hábitos posturales
-- Motiva al usuario a mantener consistencia con el corrector
-- Si reporta dolor intenso, recomienda consultar un médico
-- Responde SIEMPRE en español colombiano natural y amigable
-- Máximo 120 palabras por respuesta para mantener fluidez
-- Usa emojis ocasionalmente para hacer la conversación más cálida`;
-
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': CLAUDE_KEY,
-            'anthropic-version': '2023-06-01',
-            'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-            model: 'claude-haiku-4-5-20251001',
-            max_tokens: 300,
-            system: sistema,
-            messages: historial.slice(-12)
-        })
-    });
-
-    if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        throw new Error(err.error?.message || 'API error');
-    }
-    const data = await response.json();
-    return data.content[0].text;
-}
-
-// ─── HELPERS ─────────────────────────────────────────────────────
+// ── UTILS ──────────────────────────────────────────────────
+function getSaludo() { const h=new Date().getHours(); return h>=5&&h<12?'Buenos dias':h>=12&&h<19?'Buenas tardes':'Buenas noches'; }
 function enc(s) { return encodeURIComponent(s); }
+function teclaEnter(e) { if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); enviarMensaje(); } }
+function autoResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,90)+'px'; }
+function guardarSesion() { localStorage.setItem('coach_usuario', JSON.stringify(usuario)); }
+function limpiarHistorial() {
+    if(!confirm('Borrar todo el historial del chat?')) return;
+    localStorage.removeItem('chat_'+usuario.email); historial=[];
+    document.getElementById('chat-mensajes').innerHTML='';
+    const msg=`${getSaludo()} ${usuario.nombre.split(' ')[0]}! Empecemos de nuevo. Como va tu postura hoy?`;
+    agregarBurbuja('coach',msg); showBubble(msg);
+}
 
-function teclaEnter(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        enviarMensaje();
+// ── PROMO CARD ─────────────────────────────────────────────
+function inyectarPromo() {
+    const zona = document.getElementById('cam-promo-zone');
+    if(localStorage.getItem('cam_promo_cerrada')) { zona.innerHTML=''; return; }
+    zona.innerHTML = `
+    <div class="cam-promo-card" onclick="document.getElementById('cam-promo-zone').innerHTML=''; abrirCamara();">
+        <button class="cam-promo-close" onclick="event.stopPropagation(); localStorage.setItem('cam_promo_cerrada','1'); this.closest('.cam-promo-card').remove()">✕</button>
+        <div class="cam-promo-icon">📷</div>
+        <div class="cam-promo-text">
+            <div class="cam-promo-tag">IA + Camara en vivo</div>
+            <div class="cam-promo-title">¿Tu postura esta bien ahora?</div>
+            <div class="cam-promo-sub">Scanea en 5 segundos · resultado instantaneo</div>
+        </div>
+        <div class="cam-promo-arrow">›</div>
+    </div>`;
+}
+
+// ── JSONP ──────────────────────────────────────────────────
+function jsonp(url) {
+    return new Promise((resolve,reject)=>{
+        const cb='_cb'+Date.now()+Math.random().toString(36).slice(2);
+        const s=document.createElement('script'); s.src=url+'&callback='+cb;
+        const t=setTimeout(()=>{ delete window[cb]; document.body.removeChild(s); reject(new Error('timeout')); },10000);
+        window[cb]=data=>{ clearTimeout(t); delete window[cb]; document.body.removeChild(s); resolve(data); };
+        s.onerror=()=>{ clearTimeout(t); reject(new Error('red')); };
+        document.body.appendChild(s);
+    });
+}
+
+// ── AUTH ───────────────────────────────────────────────────
+function cambiarTab(tab) {
+    document.getElementById('tab-login').classList.toggle('activo',tab==='login');
+    document.getElementById('tab-registro').classList.toggle('activo',tab==='registro');
+    document.getElementById('form-login').style.display=tab==='login'?'flex':'none';
+    document.getElementById('form-registro').style.display=tab==='registro'?'flex':'none';
+}
+async function registrarse() {
+    const nombre=document.getElementById('reg-nombre').value.trim(), email=document.getElementById('reg-email').value.trim().toLowerCase(), pass=document.getElementById('reg-pass').value;
+    const err=document.getElementById('reg-error'), btn=document.getElementById('btn-registro');
+    err.style.display='none';
+    if(!nombre||!email||pass.length<6){ err.textContent='Completa todos los campos'; err.style.display='block'; return; }
+    btn.disabled=true; btn.textContent='Creando cuenta...';
+    try {
+        const res=await jsonp(`${APPS_URL}?action=registro_usuario&nombre=${enc(nombre)}&email=${enc(email)}&password=${enc(pass)}`);
+        if(res.error){ err.textContent=res.error; err.style.display='block'; return; }
+        usuario=res.usuario; guardarSesion(); mostrarOnboarding();
+    } catch(e){ err.textContent='Error de conexion'; err.style.display='block'; }
+    finally{ btn.disabled=false; btn.textContent='Crear cuenta'; }
+}
+async function iniciarSesion() {
+    const email=document.getElementById('login-email').value.trim().toLowerCase(), pass=document.getElementById('login-pass').value;
+    const err=document.getElementById('login-error'), btn=document.getElementById('btn-login');
+    err.style.display='none';
+    if(!email||!pass){ err.style.display='block'; return; }
+    btn.disabled=true; btn.textContent='Entrando...';
+    try {
+        const res=await jsonp(`${APPS_URL}?action=login_usuario&email=${enc(email)}&password=${enc(pass)}`);
+        if(res.error){ err.style.display='block'; return; }
+        usuario=res.usuario; guardarSesion();
+        if(!usuario.corrector) mostrarOnboarding(); else mostrarChat();
+    } catch(e){ err.textContent='Error de conexion'; err.style.display='block'; }
+    finally{ btn.disabled=false; btn.textContent='Entrar'; }
+}
+
+// ── NAVIGATION ─────────────────────────────────────────────
+function mostrarOnboarding() {
+    document.getElementById('pantalla-auth').style.display='none';
+    document.getElementById('ob-nombre').textContent=usuario.nombre.split(' ')[0];
+    document.getElementById('modal-onboarding').style.display='flex';
+}
+async function guardarPerfil() {
+    const corrector=document.getElementById('ob-corrector').value, horas=document.getElementById('ob-horas').value;
+    const semanas=document.getElementById('ob-semanas').value||'0';
+    const dolores=[...document.querySelectorAll('.dolores-grid input:checked')].map(i=>i.value).join(', ')||'ninguna';
+    const btn=document.getElementById('btn-onboarding');
+    if(!corrector||!horas){ alert('Selecciona tu corrector y las horas'); return; }
+    btn.disabled=true; btn.textContent='Guardando...';
+    usuario.corrector=corrector; usuario.horas=horas; usuario.semanas=semanas; usuario.dolores=dolores;
+    guardarSesion();
+    try{ await jsonp(`${APPS_URL}?action=guardar_perfil&email=${enc(usuario.email)}&corrector=${enc(corrector)}&horas=${enc(horas)}&semanas=${enc(semanas)}&dolores=${enc(dolores)}`); }catch(e){}
+    document.getElementById('modal-onboarding').style.display='none';
+    mostrarChat();
+}
+function mostrarProximamente() {
+    ['pantalla-auth','modal-onboarding','pantalla-chat'].forEach(id=>document.getElementById(id).style.display='none');
+    document.getElementById('pantalla-proximamente').style.display='flex';
+    document.getElementById('prox-corrector').textContent=usuario.corrector?usuario.corrector.split('—')[0].trim():'Sin registrar';
+}
+function mostrarChat() {
+    document.getElementById('pantalla-auth').style.display='none';
+    document.getElementById('modal-onboarding').style.display='none';
+    document.getElementById('pantalla-proximamente').style.display='none';
+    document.getElementById('pantalla-chat').style.display='flex';
+    document.getElementById('chat-nombre').textContent=usuario.nombre;
+    document.getElementById('chip-corrector').textContent=usuario.corrector?usuario.corrector.split('—')[0].trim():'Sin corrector';
+    const sem=parseInt(usuario.semanas)||0;
+    document.getElementById('chip-semanas').textContent=sem===1?'1 semana':`${sem} semanas`;
+    inyectarPromo();
+    historial=JSON.parse(localStorage.getItem('chat_'+usuario.email)||'[]');
+    const cont=document.getElementById('chat-mensajes'); cont.innerHTML='';
+    if(historial.length===0){
+        const cor=usuario.corrector?usuario.corrector.split('—')[0].trim():'tu corrector';
+        const msg=`${getSaludo()} ${usuario.nombre.split(' ')[0]}! Soy tu coach postural. Llevas ${usuario.semanas||'0'} semana(s) con tu ${cor}. Como te has sentido? Tambien puedes escanear tu postura ahora mismo con el boton de camara.`;
+        agregarBurbuja('coach',msg); showBubble(msg);
+    } else {
+        historial.forEach(m=>agregarBurbuja(m.role==='assistant'?'coach':'usuario',m.content));
+        const last=historial.filter(m=>m.role==='assistant').pop();
+        if(last) showBubble(last.content);
     }
+    document.getElementById('chat-input').focus();
 }
-
-function autoResize(el) {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 110) + 'px';
-}
-
-// ─── SESIÓN ──────────────────────────────────────────────────────
-function guardarSesion() {
-    localStorage.setItem('coach_usuario', JSON.stringify(usuario));
-}
-
 function cerrarSesion() {
-    localStorage.removeItem('coach_usuario');
-    usuario = null;
-    historial = [];
-    document.getElementById('pantalla-chat').style.display = 'none';
-    document.getElementById('pantalla-auth').style.display = 'flex';
-    document.getElementById('login-email').value = '';
-    document.getElementById('login-pass').value = '';
+    localStorage.removeItem('coach_usuario'); usuario=null; historial=[];
+    ['pantalla-chat','pantalla-proximamente'].forEach(id=>document.getElementById(id).style.display='none');
+    document.getElementById('pantalla-auth').style.display='flex';
+    document.getElementById('login-email').value=''; document.getElementById('login-pass').value='';
     cambiarTab('login');
 }
 
-// ─── INIT ────────────────────────────────────────────────────────
-(function init() {
-    const saved = localStorage.getItem('coach_usuario');
-    if (saved) {
-        try {
-            const u = JSON.parse(saved);
-            if (u && u.email) {
-                usuario = u;
-                if (!usuario.corrector) mostrarOnboarding();
-                else mostrarProximamente();
-                return;
-            }
-        } catch(e) {}
+// ── CHAT ───────────────────────────────────────────────────
+function agregarBurbuja(tipo, texto) {
+    const cont=document.getElementById('chat-mensajes');
+    const div=document.createElement('div'); div.className='burbuja '+tipo;
+    if(tipo==='coach'){ const b=document.createElement('div'); b.className='coach-badge'; b.textContent='Coach Sagash'; div.appendChild(b); }
+    const p=document.createElement('p'); p.textContent=texto; div.appendChild(p);
+    cont.appendChild(div); cont.scrollTop=cont.scrollHeight;
+}
+async function enviarMensaje() {
+    const input=document.getElementById('chat-input'), texto=input.value.trim();
+    if(!texto) return;
+    const btn=document.getElementById('btn-enviar');
+    btn.disabled=true; input.value=''; input.style.height='auto';
+    agregarBurbuja('usuario',texto); historial.push({role:'user',content:texto});
+    hideBubble(); showTyping(); owlThink(true);
+    try {
+        const respuesta=await llamarClaude(historial.slice(-10));
+        hideTyping(); owlThink(false); owlBounce();
+        agregarBurbuja('coach',respuesta); showBubble(respuesta); startTabBlink();
+        historial.push({role:'assistant',content:respuesta});
+        localStorage.setItem('chat_'+usuario.email, JSON.stringify(historial.slice(-30)));
+    } catch(e) {
+        hideTyping(); owlThink(false);
+        const msg=e.message==='key'?'Falta la clave de Claude. Avisa al admin.':'Tuve un problema. Intentemos de nuevo.';
+        agregarBurbuja('coach',msg); showBubble(msg);
     }
-    document.getElementById('pantalla-auth').style.display = 'flex';
+    btn.disabled=false; input.focus();
+}
+async function llamarClaude(messages) {
+    if(CLAUDE_KEY==='TU_CLAVE_CLAUDE_AQUI') throw new Error('key');
+    const sistema=`Eres coach postural de HeyySagash (Colombia). Usuario: ${usuario.nombre} | Corrector: ${usuario.corrector||'no especificado'} | Horas sentado: ${usuario.horas||'no especificado'} | Semanas: ${usuario.semanas||'0'} | Molestia: ${usuario.dolores||'ninguna'}. Da consejos practicos, ejercicios y habitos. Si hay dolor intenso recomienda medico. Espanol colombiano amigable. Max 100 palabras.`;
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':CLAUDE_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:250,system:sistema,messages})
+    });
+    if(!res.ok) throw new Error('API');
+    return (await res.json()).content[0].text;
+}
+
+// ── SCORE RING ─────────────────────────────────────────────
+const CIRC = 2 * Math.PI * 31.5; // r=31.5
+let scoreActual = 0;
+
+function actualizarScore(score) {
+    const arc = document.getElementById('score-arc');
+    const numEl = document.getElementById('score-num');
+    const cap = document.getElementById('score-caption');
+    const offset = CIRC * (1 - score / 100);
+    arc.style.strokeDasharray = CIRC;
+    arc.style.strokeDashoffset = offset;
+    arc.style.stroke = score >= 80 ? '#4ade80' : score >= 55 ? '#C9A84C' : '#f87171';
+    numEl.textContent = score + '%';
+    numEl.style.color = score >= 80 ? '#4ade80' : score >= 55 ? '#e5c05b' : '#f87171';
+    cap.textContent = score >= 80 ? 'Excelente postura' : score >= 55 ? 'Postura aceptable' : 'Necesita mejorar';
+    cap.style.color = score >= 80 ? '#4ade8066' : score >= 55 ? '#C9A84C66' : '#f8717166';
+}
+
+function calcularScore(hombrosOk, hombrosWarn, cabezaOk, cabezaWarn, columnaOk, columnaWarn) {
+    const pts = (ok, warn) => ok ? 100 : warn ? 55 : 10;
+    return Math.round((pts(hombrosOk, hombrosWarn) * 0.35 + pts(cabezaOk, cabezaWarn) * 0.35 + pts(columnaOk, columnaWarn) * 0.30));
+}
+
+// ── CAMERA ML ──────────────────────────────────────────────
+let camStream=null, camRunning=false, poseInst=null, camUtilInst=null;
+
+async function abrirCamara() {
+    const modal=document.getElementById('modal-camara');
+    const loading=document.getElementById('cam-loading'), canvas=document.getElementById('cam-canvas');
+    modal.style.display='flex'; loading.style.display='flex'; canvas.style.display='none';
+    document.getElementById('btn-analizar-ia').disabled=true;
+    document.getElementById('score-num').textContent='—';
+    document.getElementById('score-caption').textContent='Detectando posicion...';
+    document.getElementById('score-arc').style.strokeDashoffset=CIRC;
+    resetChips();
+    try {
+        await cargarMediaPipe();
+        camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false});
+        const video=document.getElementById('cam-video');
+        video.srcObject=camStream;
+        await new Promise(r=>{ video.onloadedmetadata=r; });
+        await video.play();
+        canvas.width=video.videoWidth||640; canvas.height=video.videoHeight||480;
+        canvas.style.display='block'; loading.style.display='none';
+        document.getElementById('scan-line').style.display='block';
+
+        poseInst=new Pose({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}`});
+        poseInst.setOptions({modelComplexity:1,smoothLandmarks:true,enableSegmentation:false,minDetectionConfidence:0.5,minTrackingConfidence:0.5});
+        poseInst.onResults(onPoseResults);
+        camRunning=true;
+        camUtilInst=new Camera(video,{
+            onFrame:async()=>{ if(camRunning&&poseInst) await poseInst.send({image:video}); },
+            width:canvas.width, height:canvas.height
+        });
+        camUtilInst.start();
+    } catch(err) {
+        loading.innerHTML=`<span style="color:#f87171;font-size:0.82rem;text-align:center;padding:1rem">No se pudo acceder a la camara.<br>Revisa los permisos del navegador.</span>`;
+    }
+}
+
+function onPoseResults(results) {
+    const canvas=document.getElementById('cam-canvas'), ctx=canvas.getContext('2d');
+    const W=canvas.width, H=canvas.height;
+    ctx.save(); ctx.translate(W,0); ctx.scale(-1,1); ctx.drawImage(results.image,0,0,W,H); ctx.restore();
+    if(!results.poseLandmarks) return;
+    const lm=results.poseLandmarks, ml=lm.map(p=>({...p,x:1-p.x}));
+    const conns=[[11,12],[11,23],[12,24],[23,24],[11,13],[12,14],[0,11],[0,12],[13,15],[14,16]];
+    ctx.strokeStyle='#C9A84C55'; ctx.lineWidth=2;
+    conns.forEach(([a,b])=>{
+        if(ml[a].visibility>0.35&&ml[b].visibility>0.35){
+            ctx.beginPath(); ctx.moveTo(ml[a].x*W,ml[a].y*H); ctx.lineTo(ml[b].x*W,ml[b].y*H); ctx.stroke();
+        }
+    });
+    [0,11,12,23,24].forEach(i=>{
+        if(ml[i].visibility>0.35){
+            ctx.beginPath(); ctx.arc(ml[i].x*W,ml[i].y*H,5,0,Math.PI*2);
+            ctx.fillStyle='#C9A84C'; ctx.fill();
+            ctx.strokeStyle='#00000088'; ctx.lineWidth=1.5; ctx.stroke();
+        }
+    });
+    actualizarIndicadores(lm);
+    document.getElementById('btn-analizar-ia').disabled=false;
+}
+
+function actualizarIndicadores(lm) {
+    const ls=lm[11],rs=lm[12],lh=lm[23],rh=lm[24],nose=lm[0];
+    if(ls.visibility<0.3||rs.visibility<0.3) return;
+    const shoulderDiff=Math.abs(ls.y-rs.y);
+    const shoulderMidX=(ls.x+rs.x)/2;
+    const headOffset=Math.abs(nose.x-shoulderMidX);
+    const hipMidX=(lh.visibility>0.3&&rh.visibility>0.3)?(lh.x+rh.x)/2:shoulderMidX;
+    const spineOff=Math.abs(shoulderMidX-hipMidX);
+    const hOk=shoulderDiff<0.03, hWarn=shoulderDiff<0.07;
+    const cOk=headOffset<0.04,  cWarn=headOffset<0.09;
+    const sOk=spineOff<0.04,    sWarn=spineOff<0.09;
+    setChip('pchip-hombros','pval-hombros', hOk?'ok':hWarn?'warn':'mal', hOk?'Nivelados':ls.y<rs.y?'Izq. elevado':'Der. elevado');
+    setChip('pchip-cabeza','pval-cabeza',   cOk?'ok':cWarn?'warn':'mal', cOk?'Centrada':cWarn?'Leve desvio':'Adelantada');
+    setChip('pchip-columna','pval-columna', sOk?'ok':sWarn?'warn':'mal', sOk?'Alineada':sWarn?'Leve desvio':'Desviada');
+    actualizarScore(calcularScore(hOk,hWarn,cOk,cWarn,sOk,sWarn));
+}
+
+function setChip(chipId,valId,cls,texto) {
+    document.getElementById(chipId).className='postura-chip '+cls;
+    document.getElementById(valId).textContent=texto;
+}
+function resetChips() {
+    ['pchip-hombros','pchip-cabeza','pchip-columna'].forEach(id=>document.getElementById(id).className='postura-chip');
+    ['pval-hombros','pval-cabeza','pval-columna'].forEach(id=>document.getElementById(id).textContent='—');
+}
+function cerrarCamara() {
+    camRunning=false;
+    if(camUtilInst){ try{camUtilInst.stop();}catch(e){} camUtilInst=null; }
+    if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
+    poseInst=null;
+    document.getElementById('scan-line').style.display='none';
+    document.getElementById('modal-camara').style.display='none';
+    resetChips();
+}
+async function analizarConIA() {
+    if(CLAUDE_KEY==='TU_CLAVE_CLAUDE_AQUI'){ alert('Falta la clave de Claude. Avisa al admin.'); return; }
+    const btn=document.getElementById('btn-analizar-ia');
+    btn.disabled=true; btn.textContent='Analizando...';
+    try {
+        const canvas=document.getElementById('cam-canvas');
+        const imageB64=canvas.toDataURL('image/jpeg',0.82).split(',')[1];
+        const scoreTexto=document.getElementById('score-num').textContent;
+        cerrarCamara(); mostrarChat();
+        agregarBurbuja('usuario',`📷 Analiza mi postura (score: ${scoreTexto})`);
+        showTyping(); owlThink(true);
+        const sistema=`Eres coach postural de HeyySagash (Colombia). Usuario: ${usuario.nombre}, lleva ${usuario.semanas||'0'} semana(s) con ${usuario.corrector||'corrector de postura'}. Ve la imagen y analiza: nivelacion de hombros, posicion de la cabeza, alineacion de columna. Da un diagnostico breve, motivador y consejos especificos. Max 110 palabras en espanol colombiano amigable.`;
+        const res=await fetch('https://api.anthropic.com/v1/messages',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','x-api-key':CLAUDE_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+            body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:300,system:sistema,messages:[{role:'user',content:[
+                {type:'image',source:{type:'base64',media_type:'image/jpeg',data:imageB64}},
+                {type:'text',text:'Analiza mi postura en esta foto y dame consejos especificos.'}
+            ]}]})
+        });
+        const respuesta=(await res.json()).content[0].text;
+        hideTyping(); owlThink(false); owlBounce();
+        agregarBurbuja('coach',respuesta); showBubble(respuesta); startTabBlink();
+        historial.push({role:'user',content:'Analiza mi postura (foto enviada)'});
+        historial.push({role:'assistant',content:respuesta});
+        localStorage.setItem('chat_'+usuario.email,JSON.stringify(historial.slice(-30)));
+    } catch(e){ hideTyping(); owlThink(false); agregarBurbuja('coach','No pude analizar la foto. Intentalo de nuevo.'); }
+    btn.disabled=false; btn.textContent='Analizar con Coach IA →';
+}
+
+// ── MEDIAPIPE LAZY LOAD ────────────────────────────────────
+async function cargarMediaPipe() {
+    if(window._mpLoaded) return;
+    await Promise.all([
+        loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js'),
+        loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js'),
+        loadScript('https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js')
+    ]);
+    window._mpLoaded=true;
+}
+function loadScript(src) {
+    return new Promise((resolve,reject)=>{ const s=document.createElement('script'); s.src=src; s.crossOrigin='anonymous'; s.onload=resolve; s.onerror=reject; document.head.appendChild(s); });
+}
+
+// ── INIT ───────────────────────────────────────────────────
+(function init() {
+    const saved=localStorage.getItem('coach_usuario');
+    if(saved){ try{ const u=JSON.parse(saved); if(u&&u.email){ usuario=u; if(!usuario.corrector) mostrarOnboarding(); else mostrarChat(); return; } }catch(e){} }
+    document.getElementById('pantalla-auth').style.display='flex';
 })();
 </script>
 </body>
